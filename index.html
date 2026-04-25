@@ -824,6 +824,7 @@ const USERS = {
   '1111':   { name: '小江',       role: 'manager'    },
   '3333':   { name: '阿威',       role: 'staff'      },
   '6666':   { name: 'Kevin',      role: 'staff'      },
+  '9999':   { name: '何何',       role: 'staff', canEditCalendar: true },  // 員工權限 + 額外可編輯行事曆
   '383838': { name: '測試帳號',    role: 'demo'       },  // 員工層級測試
   '3838':   { name: '管理測試',    role: 'demo_admin' }   // 管理員層級測試（看得到全部分頁，但寫入只在本地）
 };
@@ -835,6 +836,7 @@ const AVATARS = {
   '小江':     'images/avatar-xiaojiang.jpg',
   '阿威':     'images/avatar-awei.png',
   'Kevin':    'images/avatar-kevin.png',
+  '何何':     'images/avatar-hoho.png',                    // ⚠️ 需要將 avatar-hoho.png 上傳到 images/ 資料夾
   '測試帳號': 'images/logo.png',
   '管理測試': 'images/logo.png'
 };
@@ -958,6 +960,12 @@ function isManagerRole(){
   if (!State.user) return false;
   const r = State.user.role;
   return r === 'admin' || r === 'manager' || r === 'demo_admin';
+}
+/* 是否能編輯行事曆：manager 以上 + 設了 canEditCalendar 旗標的特殊員工（如何何） */
+function canEditCalendar(){
+  if (!State.user) return false;
+  if (isManagerRole()) return true;
+  return !!State.user.canEditCalendar;
 }
 /* 金額格式化：demo 帳號（測試帳號 / 管理測試）時自動把最高位數以 * 取代。
    注意：本函式被全前端所有金額顯示處呼叫，因此 demo 一律遮罩生效。 */
@@ -2370,8 +2378,8 @@ function renderCalendar(){
     cell.onclick = ()=>{
       selectedDayDS = ds;
       renderDayEvents();   // 仍然更新下方該日事件清單（關閉表單後可看到）
-      // 管理層點任一日期 → 直接打開新增事件表單，起訖時間自動帶入該日 09:00 ~ 18:00
-      if (isManagerRole()) {
+      // 可編輯行事曆者點任一日期 → 直接打開新增事件表單，起訖時間自動帶入該日 09:00 ~ 18:00
+      if (canEditCalendar()) {
         showEventForm(null);
       }
     };
@@ -2386,9 +2394,9 @@ function renderCalendar(){
   }
   renderDayEvents();
 
-  // 「+ 新增事件」只給 manager+
+  // 「+ 新增事件」給 manager+ 或有 canEditCalendar 旗標者（如何何）
   const addRow = $('#cal-add-row');
-  addRow.style.display = isManagerRole() ? '' : 'none';
+  addRow.style.display = canEditCalendar() ? '' : 'none';
   $('#btn-add-event').onclick = ()=> showEventForm(null);
 }
 
@@ -2415,8 +2423,8 @@ function renderDayEvents(){
   const d = new Date(selectedDayDS);
   $('#day-events-title').textContent = `${selectedDayDS}（週${['日','一','二','三','四','五','六'][d.getDay()]}）的事件`;
 
-  const canAdd = isManagerRole();
-  // 「+ 在這天新增事件」按鈕（manager+ 才顯示）
+  const canAdd = canEditCalendar();
+  // 「+ 在這天新增事件」按鈕（manager+ 或有 canEditCalendar 旗標者才顯示）
   const addBtnHTML = canAdd
     ? `<button class="btn" id="day-add-event" style="margin:6px 0 12px;width:100%;padding:11px;font-size:14px;">+ 在 ${selectedDayDS.substring(5)} 這天新增事件</button>`
     : '';
@@ -2474,7 +2482,7 @@ function showEventDetail(ev){
     return `<span class="person-chip">${ava?'<img src="'+ava+'">':''}${n}</span>`;
   }).join('');
 
-  const canEdit = isManagerRole();
+  const canEdit = canEditCalendar();
   const root = $('#modal-root');
   root.innerHTML = `
     <div class="modal-mask" id="ev-mask">
