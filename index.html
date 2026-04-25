@@ -353,13 +353,13 @@
       </div>
 
       <div class="kpi-grid mb-12">
-        <div class="card" style="margin:0;">
-          <div class="sub">本月餐廳累積</div>
+        <div class="card clickable" style="margin:0;cursor:pointer;" id="card-month-rev" role="button" tabindex="0">
+          <div class="sub">本月餐廳累積　<span style="float:right;font-size:11px;color:#a83232;">點擊查看 ▸</span></div>
           <div style="font-size:20px;font-weight:700;color:#7a1f1f;" id="kpi-month-rev">—</div>
           <div class="sub" id="kpi-month-meta">— / —</div>
         </div>
-        <div class="card" style="margin:0;">
-          <div class="sub">本月餐車累積</div>
+        <div class="card clickable" style="margin:0;cursor:pointer;" id="card-month-cart" role="button" tabindex="0">
+          <div class="sub">本月餐車累積　<span style="float:right;font-size:11px;color:#a83232;">點擊查看 ▸</span></div>
           <div style="font-size:20px;font-weight:700;color:#a83232;" id="kpi-month-cart">—</div>
           <div class="sub" id="kpi-month-cart-meta">租金累積：—</div>
         </div>
@@ -632,8 +632,12 @@ const LABOR_HOURLY_COST = 200;
 const SAMPLE_REPORTS = [
   { date:'2026-04-20', type:'餐廳', revenue:17824, laborHours:25, rent:0, wasteItems:[], wasteNote:'示範資料' },
   { date:'2026-04-21', type:'餐廳', revenue:0,     laborHours:24, rent:0, wasteItems:[], wasteNote:'示範資料·備料日' },
-  { date:'2026-04-22', type:'餐廳', revenue:34782, laborHours:30, rent:0, wasteItems:[], wasteNote:'示範資料' },
-  { date:'2026-04-23', type:'餐廳', revenue:18546, laborHours:36, rent:0, wasteItems:[], wasteNote:'示範資料' },
+  { date:'2026-04-22', type:'餐廳', revenue:34782, laborHours:30, rent:0,
+    wasteItems:[ { id:'W6', name:'漢堡肉排', unit:'片', qty:15, unitCost:30, amount:450, reason:'丟了15片漢堡排' } ],
+    wasteNote:'示範資料' },
+  { date:'2026-04-23', type:'餐廳', revenue:18546, laborHours:36, rent:0,
+    wasteItems:[ { id:'W6', name:'漢堡肉排', unit:'片', qty:15, unitCost:30, amount:450, reason:'丟了15片漢堡排' } ],
+    wasteNote:'示範資料' },
   { date:'2026-04-24', type:'餐廳', revenue:17443, laborHours:30, rent:0, wasteItems:[], wasteNote:'示範資料' }
 ];
 
@@ -733,7 +737,18 @@ function fmtNT(v){ const n = Number(v||0); return n.toLocaleString('zh-TW', {max
 function pad2(n){ return String(n).padStart(2,'0'); }
 function dateOnly(d){
   if (!d) return '';
-  if (typeof d === 'string') return d.substring(0,10);
+  if (typeof d === 'string') {
+    // 若是 Apps Script 傳回的 ISO UTC 格式（例如 "2026-04-01T16:00:00.000Z"），
+    // 直接取前 10 碼會差 1 天（因為 UTC 比 Taipei 慢 8 小時）。要先轉成 Taipei 時區。
+    if (d.length > 10 && d.includes('T')) {
+      const utc = new Date(d);
+      if (!isNaN(utc.getTime())) {
+        const taipei = new Date(utc.getTime() + 8 * 60 * 60 * 1000);
+        return taipei.toISOString().substring(0,10);
+      }
+    }
+    return d.substring(0,10);
+  }
   return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
 }
 function todayStr(){ return dateOnly(new Date()); }
@@ -963,7 +978,7 @@ function renderDashboard(){
     tr.innerHTML = `
       <td>${ds.substring(5)} (${weekdayShort(d)}) ${tg && tg.HolidayName ? '<span class="badge badge-holiday">'+tg.HolidayName+'</span>' : ''}</td>
       <td>${isPrep ? '備料日' : (tg ? fmtNT(tgVal) : '—')}</td>
-      <td>${restRev || cartRev ? `餐廳 ${fmtNT(restRev)}${cartRev?'<br><span class="small">餐車 '+fmtNT(cartRev)+'</span>':''}` : '—'}</td>
+      <td>${restRev || cartRev ? `${fmtNT(restRev)}${cartRev?'<br><span class="small">餐車 '+fmtNT(cartRev)+'</span>':''}` : '—'}</td>
       <td class="${pctClass}">${pct === null ? '—' : pct + '%'}</td>
       <td>${lab ? lab : '—'}</td>
       <td class="${lpClass}">${lp === null ? '—' : lp + '%'}</td>
@@ -998,6 +1013,101 @@ function renderDashboard(){
   $('#kpi-month-meta').textContent = `${mTarget>0 ? Math.round(mRest/mTarget*100) : 0}% / 目標 $${fmtNT(mTarget)}`;
   $('#kpi-month-cart').textContent = '$' + fmtNT(mCart);
   $('#kpi-month-cart-meta').textContent = `租金累積：$${fmtNT(mRent)}`;
+
+  // 點擊 KPI 卡片 → 開明細 modal
+  const cardRest = $('#card-month-rev');
+  const cardCart = $('#card-month-cart');
+  if (cardRest) cardRest.onclick = ()=>showMonthDetailModal('餐廳');
+  if (cardCart) cardCart.onclick = ()=>showMonthDetailModal('餐車');
+}
+
+/* =========================================================
+ *  本月某類型（餐廳 / 餐車）明細 Modal
+ * ========================================================= */
+function showMonthDetailModal(type){
+  const ym = todayStr().substring(0,7);
+  const [yy, mm] = ym.split('-').map(Number);
+  const last = new Date(yy, mm, 0).getDate();
+  let total = 0, target = 0, rent = 0, wasteCost = 0, totalLab = 0;
+  const rows = [];
+  for (let d=1; d<=last; d++){
+    const ds = `${yy}-${pad2(mm)}-${pad2(d)}`;
+    const dayReports = reportsByDate(ds, type);
+    const dayRev   = sumRevenue(dayReports);
+    const dayLab   = sumLabor(dayReports);
+    const dayRent  = sumRent(dayReports);
+    const dayWaste = dayReports.reduce((a,r)=>a+Number(r.WasteCost||0), 0);
+    let dayTarget = 0;
+    if (type === '餐廳') {
+      const tg = targetByDate(ds);
+      const isPrep = tg && (tg.IsPrepDay === 'Y' || tg.IsPrepDay === true);
+      dayTarget = isPrep ? 0 : (tg ? Number(tg.RevenueTarget||0) : 0);
+    }
+    total += dayRev; target += dayTarget; rent += dayRent;
+    wasteCost += dayWaste; totalLab += dayLab;
+    if (dayRev > 0 || dayLab > 0 || dayRent > 0 || dayWaste > 0) {
+      rows.push({ ds, dayRev, dayLab, dayTarget, dayRent, dayWaste });
+    }
+  }
+  const pct = target > 0 ? Math.round(total/target*100) : null;
+  const lp  = totalLab > 0 && total > 0 ? Math.round(totalLab*LABOR_HOURLY_COST/total*100) : null;
+
+  const wkShort = ['日','一','二','三','四','五','六'];
+  const tableHTML = rows.length ? `
+    <div style="overflow-x:auto;">
+      <table class="week-table" style="font-size:12px;">
+        <thead><tr>
+          <th>日期</th>
+          ${type==='餐廳' ? '<th>目標</th>' : ''}
+          <th>實績</th>
+          ${type==='餐廳' ? '<th>達成%</th>' : ''}
+          <th>人時</th>
+          ${type==='餐車' ? '<th>租金</th>' : ''}
+          <th>報廢</th>
+        </tr></thead>
+        <tbody>
+        ${rows.map(r => {
+          const wk = wkShort[new Date(r.ds).getDay()];
+          const dpct = r.dayTarget > 0 ? Math.round(r.dayRev/r.dayTarget*100) : null;
+          let cls = 'pct';
+          if (dpct !== null) cls += dpct>=100?' ok':(dpct>=80?' warn':' bad');
+          return `<tr>
+            <td>${r.ds.substring(5)} (${wk})</td>
+            ${type==='餐廳' ? `<td>${r.dayTarget ? fmtNT(r.dayTarget) : '—'}</td>` : ''}
+            <td>${r.dayRev ? fmtNT(r.dayRev) : '—'}</td>
+            ${type==='餐廳' ? `<td class="${cls}">${dpct===null?'—':dpct+'%'}</td>` : ''}
+            <td>${r.dayLab ? r.dayLab : '—'}</td>
+            ${type==='餐車' ? `<td>${r.dayRent ? fmtNT(r.dayRent) : '—'}</td>` : ''}
+            <td>${r.dayWaste ? '$'+fmtNT(r.dayWaste) : '—'}</td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>
+    </div>` : '<div class="empty">本月尚無資料</div>';
+
+  const summary = type === '餐廳'
+    ? `<div class="kpi"><div class="label">本月累積</div><div class="val">$${fmtNT(total)}</div><div class="meta">${pct!==null?pct+'% / 目標 $'+fmtNT(target):'無目標'}</div></div>`
+    : `<div class="kpi warm"><div class="label">本月累積</div><div class="val">$${fmtNT(total)}</div><div class="meta">租金累積 $${fmtNT(rent)}</div></div>`;
+
+  const root = $('#modal-root');
+  root.innerHTML = `
+    <div class="modal-mask">
+      <div class="modal" style="max-width: 560px;">
+        <h3>本月${type}明細</h3>
+        <div class="kpi-grid mb-12">
+          ${summary}
+          <div class="card" style="margin:0;">
+            <div class="sub">總人時</div>
+            <div style="font-size:18px;font-weight:700;color:#3f1d1d;">${totalLab} h</div>
+            <div class="sub">${lp!==null?'佔營業額 '+lp+'%':'—'}</div>
+            <div class="sub" style="margin-top:6px;">本月報廢　<b style="color:#7a1f1f;">$${fmtNT(wasteCost)}</b></div>
+          </div>
+        </div>
+        ${tableHTML}
+        <div style="margin-top:14px;"><button class="btn" id="md-close">關閉</button></div>
+      </div>
+    </div>`;
+  $('#md-close').onclick = ()=>{ root.innerHTML = ''; };
 }
 
 /* =========================================================
