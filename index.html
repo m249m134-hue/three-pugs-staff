@@ -2554,12 +2554,24 @@ function downloadICS(ev){
   ].join('\r\n');
 
   const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = (ev.Title||'event') + '.ics';
-  document.body.appendChild(a); a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-  toast('已下載 .ics 檔，請從通知中心或檔案 App 開啟匯入行事曆');
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+
+  if (isIOS) {
+    // iOS Safari：用 data: URL 直接讓系統接手，會跳出「新增至行事曆」對話框
+    const dataUrl = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics);
+    window.location.href = dataUrl;
+    toast('iPhone 上請點「新增至行事曆」加入');
+  } else {
+    // Android / Desktop：下載 .ics
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = (ev.Title||'event') + '.ics';
+    a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+    toast('已下載 .ics 檔，點通知打開即可加入行事曆');
+  }
 }
 
 /* ===== 事件新增 / 編輯 表單 modal ===== */
