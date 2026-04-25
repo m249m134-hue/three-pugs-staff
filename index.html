@@ -637,6 +637,32 @@ const SAMPLE_REPORTS = [
   { date:'2026-04-24', type:'餐廳', revenue:17443, laborHours:30, rent:0, wasteItems:[], wasteNote:'示範資料' }
 ];
 
+/* 員工填表後的鼓勵語錄（依當日達標/未達標隨機挑一句） */
+const ENCOURAGE_HIT = [
+  '太棒了！今天的數字會說話，你的努力被看見了 ✨',
+  '達標達標！辛苦的一天值得一杯好喝的犒賞自己 🍹',
+  '漂亮！今天又把目標踩在腳下了，你超強 💪',
+  '數字亮眼，心情也要跟著發亮！謝謝你今天的拼勁',
+  '今天的你，就是店裡最閃的那顆星 ⭐',
+  '達標的感覺真好對吧？這份成就感是你應得的',
+  '厲害了！穩穩達標，這就是專業的力量',
+  '每一筆業績背後都是你的用心，今天真的辛苦了！',
+  '目標 ✓ 達成 ✓ 心情 ✓ 三項全壘打 🎯',
+  '收工！今天你不只完成工作，還超越了自己'
+];
+const ENCOURAGE_MISS = [
+  '今天辛苦了，業績有起有落，但你的努力一直都在',
+  '沒關係，生意有節奏，明天又是全新的一場 🌤',
+  '數字只是今天的故事，不代表你的價值。好好休息吧！',
+  '一天的成績不能定義一週，放鬆一下，明天再戰 💪',
+  '謝謝你今天還是堅持把每件事做好，這份心意很珍貴',
+  '業績會起伏，但你的態度始終穩定，這才是最難得的',
+  '今天先收下這份辛苦，明天我們一起把節奏找回來',
+  '沒達標不等於沒努力，你今天真的盡力了 🙌',
+  '慢一點沒關係，重點是你還在前進。明天見！',
+  '今天的低谷，是明天高峰前的醞釀。回家好好充電 🔋'
+];
+
 /* 預設歷史累計資料（不逐日填寫，整段累計）：
  * 4/1 ~ 4/19 餐廳累計：目標 $750,000，已達成 $353,159
  * 管理員可在「管理 → 目標」一鍵匯入 */
@@ -1170,13 +1196,68 @@ $('#btn-submit').addEventListener('click', ()=>{
           wasteItems: wasteItems,
           wasteNote: wasteNote
         });
-        toast('送出成功');
         await refreshAll(false);
-        go('dashboard');
+        // 依當日達標狀況彈出鼓勵語錄（只針對餐廳、且當日有設目標）
+        showEncouragement({ date, type, revenue: rev });
       } catch (e) { toast('送出失敗：' + e.message); }
     }
   });
 });
+
+/* =========================================================
+ *  送出後鼓勵語錄
+ * ========================================================= */
+function pickRandom(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+function showEncouragement({ date, type, revenue }){
+  // 餐車沒設目標 → 直接顯示「已送出」並回儀表板
+  if (type === '餐車') {
+    showResultModal({ title: '送出成功 🚚', emoji: '✅', message: '餐車紀錄已寫入雲端，謝謝您的回報！' });
+    return;
+  }
+  // 餐廳：依當日目標判斷達標 / 未達標
+  const tg = targetByDate(date);
+  const isPrep = tg && (tg.IsPrepDay === 'Y' || tg.IsPrepDay === true);
+  const target = isPrep ? 0 : (tg ? Number(tg.RevenueTarget || 0) : 0);
+
+  // 備料日或當日無目標 → 中性訊息
+  if (isPrep || target <= 0) {
+    showResultModal({ title: '送出成功 ✨', emoji: '✅', message: isPrep ? '今天是備料日，辛苦了！明天加油 💪' : '已記錄今日營業額，謝謝您的回報！' });
+    return;
+  }
+
+  // 有目標 → 依達標與否挑一句
+  const hit = revenue >= target;
+  const msg = pickRandom(hit ? ENCOURAGE_HIT : ENCOURAGE_MISS);
+  const pct = Math.round(revenue / target * 100);
+  showResultModal({
+    title: hit ? '達標！🎉' : '已送出 💛',
+    emoji: hit ? '🎉' : '💛',
+    headline: hit ? '太棒了！今天達標 ' + pct + '%' : '今日達成 ' + pct + '%（目標 $' + fmtNT(target) + '）',
+    message: msg,
+    bgClass: hit ? 'enc-hit' : 'enc-miss'
+  });
+}
+
+function showResultModal({ title, emoji, headline, message, bgClass }){
+  const root = $('#modal-root');
+  root.innerHTML = `
+    <div class="modal-mask">
+      <div class="modal" style="text-align:center;">
+        <div style="font-size:48px;line-height:1;margin:6px 0 14px;">${emoji || '✅'}</div>
+        <h3 style="text-align:center;margin-bottom:10px;">${title}</h3>
+        ${headline ? `<div style="font-size:14px;color:#5e3b2c;margin-bottom:10px;font-weight:600;">${headline}</div>` : ''}
+        <div style="font-size:15px;line-height:1.7;color:#3f1d1d;padding:14px;background:#fdf6ee;border-radius:12px;margin:10px 0 18px;">
+          ${message}
+        </div>
+        <button class="btn" id="enc-ok">收下這份心意 💛</button>
+      </div>
+    </div>`;
+  $('#enc-ok').onclick = ()=>{
+    root.innerHTML = '';
+    go('dashboard');
+  };
+}
 
 /* =========================================================
  *  Confirm Modal
