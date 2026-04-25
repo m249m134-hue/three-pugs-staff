@@ -240,7 +240,20 @@
   .modal {
     background:#fff; border-radius:16px; padding:20px; width:100%; max-width:420px;
     max-height: 88vh; overflow-y: auto;
+    position: relative;
   }
+  /* 右上角 ✕ 關閉按鈕 */
+  .modal-close {
+    position: absolute; top: 10px; right: 10px;
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 0; background: #fdf6ee; color: #7a1f1f;
+    font-size: 18px; line-height: 1; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, color .15s;
+    z-index: 5;
+  }
+  .modal-close:hover { background: #fee2e2; color: #b91c1c; }
+  .modal-close:active { transform: scale(0.95); }
   .modal h3 { margin:0 0 12px 0; font-size:17px; color:#3f1d1d; }
   .modal .row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; border-bottom:1px dashed #f3e9dc; }
   .modal .row:last-child { border-bottom:0; }
@@ -1187,8 +1200,9 @@ function showMonthDetailModal(type){
 
   const root = $('#modal-root');
   root.innerHTML = `
-    <div class="modal-mask">
+    <div class="modal-mask" id="md-mask">
       <div class="modal" style="max-width: 560px;">
+        <button type="button" class="modal-close" id="md-x" aria-label="關閉">✕</button>
         <h3>本月${type}明細</h3>
         <div class="kpi-grid mb-12">
           ${summary}
@@ -1203,7 +1217,13 @@ function showMonthDetailModal(type){
         <div style="margin-top:14px;"><button class="btn" id="md-close">關閉</button></div>
       </div>
     </div>`;
-  $('#md-close').onclick = ()=>{ root.innerHTML = ''; };
+  const closeMd = ()=>{ root.innerHTML = ''; };
+  $('#md-close').onclick = closeMd;
+  $('#md-x').onclick = closeMd;
+  // 點外圍空白處（mask 但不在 modal 上）→ 關閉
+  $('#md-mask').addEventListener('click', (e)=>{
+    if (e.target === $('#md-mask')) closeMd();
+  });
 }
 
 /* =========================================================
@@ -1466,8 +1486,9 @@ function showEncouragement({ date, type, revenue }){
 function showResultModal({ title, emoji, headline, message, bgClass }){
   const root = $('#modal-root');
   root.innerHTML = `
-    <div class="modal-mask">
+    <div class="modal-mask" id="enc-mask">
       <div class="modal" style="text-align:center;">
+        <button type="button" class="modal-close" id="enc-x" aria-label="關閉">✕</button>
         <div style="font-size:48px;line-height:1;margin:6px 0 14px;">${emoji || '✅'}</div>
         <h3 style="text-align:center;margin-bottom:10px;">${title}</h3>
         ${headline ? `<div style="font-size:14px;color:#5e3b2c;margin-bottom:10px;font-weight:600;">${headline}</div>` : ''}
@@ -1477,10 +1498,15 @@ function showResultModal({ title, emoji, headline, message, bgClass }){
         <button class="btn" id="enc-ok">收下這份心意 💛</button>
       </div>
     </div>`;
-  $('#enc-ok').onclick = ()=>{
+  const closeEnc = ()=>{
     root.innerHTML = '';
     go('dashboard');
   };
+  $('#enc-ok').onclick = closeEnc;
+  $('#enc-x').onclick = closeEnc;
+  $('#enc-mask').addEventListener('click', (e)=>{
+    if (e.target === $('#enc-mask')) closeEnc();
+  });
 }
 
 /* =========================================================
