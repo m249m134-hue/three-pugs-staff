@@ -2369,7 +2369,11 @@ function renderCalendar(){
     cell.innerHTML = `<div class="d-num">${d.getDate()}</div><div class="dots">${dotsHTML}</div>`;
     cell.onclick = ()=>{
       selectedDayDS = ds;
-      renderDayEvents();
+      renderDayEvents();   // 仍然更新下方該日事件清單（關閉表單後可看到）
+      // 管理層點任一日期 → 直接打開新增事件表單，起訖時間自動帶入該日 09:00 ~ 18:00
+      if (isManagerRole()) {
+        showEventForm(null);
+      }
     };
     grid.appendChild(cell);
   });
