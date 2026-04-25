@@ -1,0 +1,1697 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7a1f1f">
+<title>Three Pugs Staff · 營業回報</title>
+<link rel="icon" href="images/logo.png">
+<style>
+  /* ---------- 基本 ---------- */
+  *,*::before,*::after { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    background:#fdf6ee;
+    color:#1f1815;
+    min-height: 100vh;
+    -webkit-tap-highlight-color: transparent;
+  }
+  button { font-family: inherit; cursor: pointer; }
+
+  /* ---------- 頂列 ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: linear-gradient(135deg,#7a1f1f,#a83232);
+    color:#fff;
+    padding: 10px 14px;
+    display:flex; align-items:center; justify-content:space-between;
+    box-shadow: 0 2px 6px rgba(0,0,0,.18);
+  }
+  .topbar .brand { display:flex; align-items:center; gap:10px; }
+  .topbar .brand img { width:36px; height:36px; border-radius:8px; background:#fff; object-fit:contain; padding:2px; }
+  .topbar .brand .titles { line-height:1.15; }
+  .topbar .brand h1 { margin:0; font-size:15px; font-weight:700; letter-spacing:.5px; }
+  .topbar .brand .sub { font-size:11px; opacity:.85; }
+  .topbar .who-block { display:flex; align-items:center; gap:8px; }
+  .topbar .who { font-size:12px; opacity:.95; }
+  .topbar .avatar {
+    width:32px; height:32px; border-radius:50%;
+    background:#fff; border:2px solid rgba(255,255,255,.6);
+    object-fit: cover; object-position: center top;
+    overflow:hidden;
+  }
+  .topbar .btn-logout {
+    background: rgba(255,255,255,.18); color:#fff; border:0; border-radius:8px;
+    font-size:12px; padding:6px 10px;
+  }
+
+  /* ---------- 內容容器 ---------- */
+  .wrap { padding: 14px; padding-bottom: 90px; max-width: 720px; margin: 0 auto; }
+
+  /* ---------- 卡片 ---------- */
+  .card {
+    background:#fff; border-radius:14px; padding:16px;
+    box-shadow: 0 1px 3px rgba(122,31,31,.08);
+    margin-bottom:12px;
+  }
+  .card h2 { margin:0 0 10px 0; font-size:15px; color:#3f1d1d; font-weight:700; }
+  .card .sub { font-size:12px; color:#867368; }
+
+  /* KPI */
+  .kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .kpi {
+    background: linear-gradient(135deg,#7a1f1f,#a83232);
+    color:#fff; border-radius:12px; padding:14px;
+  }
+  .kpi.alt  { background: linear-gradient(135deg,#1e3a8a,#3b82f6); }
+  .kpi.warm { background: linear-gradient(135deg,#9a3412,#ea580c); }
+  .kpi.amber{ background: linear-gradient(135deg,#854d0e,#ca8a04); }
+  .kpi .label { font-size:12px; opacity:.92; }
+  .kpi .val { font-size:22px; font-weight:700; margin-top:4px; }
+  .kpi .meta { font-size:11px; opacity:.85; margin-top:4px; }
+
+  .progress { height:8px; background:rgba(255,255,255,.3); border-radius:99px; overflow:hidden; margin-top:10px; }
+  .progress > span { display:block; height:100%; background:#10b981; transition:width .4s; }
+  .progress.bad > span { background:#fca5a5; }
+  .progress.warn > span { background:#fde68a; }
+
+  /* table */
+  .week-table { width:100%; border-collapse: collapse; font-size:13px; }
+  .week-table th, .week-table td { padding:8px 6px; text-align:right; border-bottom:1px solid #f3e9dc; }
+  .week-table th:first-child, .week-table td:first-child { text-align:left; }
+  .week-table th { background:#fdf6ee; color:#5e3b2c; font-weight:700; font-size:12px; }
+  .week-table tr.today { background:#fff5d6; }
+  .week-table tr.prep td { color:#a8907e; font-style:italic; }
+  .week-table .pct.ok { color:#15803d; font-weight:700; }
+  .week-table .pct.warn { color:#b45309; font-weight:700; }
+  .week-table .pct.bad { color:#b91c1c; font-weight:700; }
+  .badge {
+    display:inline-block; padding:2px 7px; border-radius:99px;
+    font-size:11px; line-height:1.4;
+  }
+  .badge-restaurant { background:#dbeafe; color:#1d4ed8; }
+  .badge-cart { background:#fef3c7; color:#92400e; }
+  .badge-waste { background:#fee2e2; color:#b91c1c; }
+  .badge-holiday { background:#fce7f3; color:#9d174d; }
+
+  /* form */
+  .form-row { margin-bottom:12px; }
+  .form-row label { display:block; font-size:13px; color:#3f1d1d; margin-bottom:6px; font-weight:600; }
+  .form-row input[type=date],
+  .form-row input[type=number],
+  .form-row input[type=text],
+  .form-row input[type=password],
+  .form-row select,
+  .form-row textarea {
+    width:100%; padding:11px 12px;
+    border:1px solid #d6c1ad; border-radius:10px;
+    font-size:16px; background:#fff; color:#1f1815;
+    -webkit-appearance:none;
+  }
+  .form-row textarea { min-height:70px; resize:vertical; }
+  .form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+    outline: 2px solid #a83232; border-color:transparent;
+  }
+  .seg { display:flex; gap:8px; }
+  .seg button {
+    flex:1; padding:11px; border-radius:10px; border:1px solid #d6c1ad;
+    background:#fff; color:#3f1d1d; font-size:15px; font-weight:600;
+  }
+  .seg button.active {
+    background:#7a1f1f; color:#fff; border-color:#7a1f1f;
+  }
+
+  /* 食材報廢表格 */
+  .waste-table { width:100%; border-collapse: collapse; font-size:13px; }
+  .waste-table th, .waste-table td {
+    padding:8px 6px; border-bottom:1px solid #f3e9dc; text-align:left; vertical-align: middle;
+  }
+  .waste-table th { background:#fdf6ee; color:#5e3b2c; font-weight:700; font-size:12px; }
+  .waste-table input[type=number] {
+    width: 70px; padding:6px 8px; border:1px solid #d6c1ad; border-radius:6px;
+    font-size:15px; text-align:right;
+  }
+  .waste-table input[type=text] {
+    width:100%; padding:6px 8px; border:1px solid #d6c1ad; border-radius:6px; font-size:13px;
+  }
+  .waste-table .amt { text-align:right; font-weight:600; color:#7a1f1f; }
+  .waste-summary {
+    background:#fff5d6; padding:8px 12px; border-radius:8px; font-size:13px;
+    display:flex; justify-content:space-between; align-items:center; margin-top:10px;
+  }
+
+  .btn {
+    width:100%; padding:14px; border:0; border-radius:12px;
+    font-size:16px; font-weight:700; color:#fff;
+    background: linear-gradient(135deg,#7a1f1f,#a83232);
+    box-shadow: 0 2px 6px rgba(122,31,31,.32);
+  }
+  .btn:disabled { opacity:.5; box-shadow:none; }
+  .btn-secondary {
+    background:#fff; color:#3f1d1d; box-shadow:none;
+    border:1px solid #d6c1ad;
+  }
+  .btn-danger {
+    background: linear-gradient(135deg,#b91c1c,#ef4444);
+    box-shadow: 0 2px 6px rgba(239,68,68,.35);
+  }
+  .btn-row { display:flex; gap:10px; }
+  .btn-row .btn { flex:1; }
+
+  /* 底部導航 */
+  .navbar {
+    position: fixed; left:0; right:0; bottom:0;
+    background:#fff; border-top:1px solid #f3e9dc;
+    display:grid; z-index: 50;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .navbar a {
+    text-align:center; padding:10px 4px;
+    color:#867368; text-decoration:none; font-size:11px;
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+  }
+  .navbar a .ico { font-size:20px; line-height:1; }
+  .navbar a.active { color:#7a1f1f; }
+
+  /* modal */
+  .modal-mask {
+    position: fixed; inset: 0; background: rgba(31,24,21,.55);
+    display:flex; align-items:center; justify-content:center;
+    z-index: 100; padding: 20px;
+  }
+  .modal {
+    background:#fff; border-radius:16px; padding:20px; width:100%; max-width:420px;
+    max-height: 88vh; overflow-y: auto;
+  }
+  .modal h3 { margin:0 0 12px 0; font-size:17px; color:#3f1d1d; }
+  .modal .row { display:flex; justify-content:space-between; padding:6px 0; font-size:14px; border-bottom:1px dashed #f3e9dc; }
+  .modal .row:last-child { border-bottom:0; }
+  .modal .lbl { color:#867368; }
+
+  .empty { text-align:center; color:#a8907e; padding: 40px 0; font-size:14px; }
+
+  /* records */
+  .rec {
+    border-bottom: 1px solid #f3e9dc; padding: 12px 0;
+    display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+  }
+  .rec:last-child { border-bottom:0; }
+  .rec .top { font-size:12px; color:#867368; margin-bottom:4px; display:flex; align-items:center; gap:6px; }
+  .rec .top .mini-ava { width:18px; height:18px; border-radius:50%; object-fit:cover; }
+  .rec .num { font-size:16px; font-weight:700; }
+  .rec .right { text-align:right; min-width: 110px; }
+  .rec .right .actions { margin-top:6px; display:flex; gap:6px; justify-content:flex-end; }
+  .rec .actions button {
+    padding:5px 10px; font-size:12px; border-radius:6px; border:1px solid #d6c1ad;
+    background:#fff; color:#3f1d1d;
+  }
+  .rec .actions button.del { color:#b91c1c; border-color:#fecaca; }
+
+  /* tabs */
+  .tabs { display:flex; gap:4px; margin-bottom:12px; }
+  .tabs button {
+    flex:1; padding:9px; border-radius:10px; border:1px solid #d6c1ad;
+    background:#fff; color:#5e3b2c; font-size:13px;
+  }
+  .tabs button.active { background:#7a1f1f; color:#fff; border-color:#7a1f1f; }
+
+  .filter-row { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+  .filter-row select, .filter-row input {
+    flex:1; min-width:0; padding:8px; border:1px solid #d6c1ad; border-radius:8px; font-size:13px; background:#fff;
+  }
+
+  .toast {
+    position: fixed; left:50%; top:80px; transform: translateX(-50%);
+    background:#3f1d1d; color:#fff; padding:10px 16px; border-radius:8px;
+    font-size:14px; z-index:200; opacity:0; transition: opacity .25s;
+    pointer-events:none; max-width:90%; text-align:center;
+  }
+  .toast.show { opacity:.95; }
+
+  /* login */
+  .login-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg,#7a1f1f 0%,#1f1815 100%);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .login-card {
+    background:#fff; border-radius:18px; padding: 24px 22px; width:100%; max-width: 380px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.35);
+  }
+  .login-logo {
+    display:block; margin: 0 auto 8px auto; width: 110px; height: 110px;
+    object-fit: contain;
+  }
+  .login-card h1 {
+    margin:0 0 4px 0; font-size:19px; color:#7a1f1f; text-align:center; letter-spacing:1px;
+  }
+  .login-card .sub { color:#867368; font-size:13px; margin-bottom: 18px; text-align:center; }
+  .login-card .pad-grid {
+    display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-top:14px;
+  }
+  .login-card .pad-grid button {
+    padding: 16px 0; font-size: 20px; font-weight:600;
+    border:1px solid #f3e9dc; border-radius:10px; background:#fdf6ee; color:#3f1d1d;
+  }
+  .login-card .pad-grid button.fn { background:#fee2e2; color:#b91c1c; }
+  .login-card .pad-display {
+    width:100%; padding:14px; font-size:24px; letter-spacing:8px; text-align:center;
+    border:1px solid #d6c1ad; border-radius:10px; background:#fff;
+  }
+  .login-preview {
+    display:flex; align-items:center; gap:10px; padding:8px 12px; margin-top:10px;
+    background:#fdf6ee; border-radius:10px; border:1px dashed #d6c1ad;
+  }
+  .login-preview img { width:40px; height:40px; border-radius:50%; object-fit:cover; }
+  .login-preview .nm { font-weight:700; color:#3f1d1d; font-size:15px; }
+  .login-preview .rl { font-size:12px; color:#867368; }
+  .login-card .err { color:#dc2626; font-size:13px; margin-top:8px; min-height:18px; text-align:center; }
+
+  .small { font-size:12px; color:#867368; }
+  .right { text-align:right; }
+  .center { text-align:center; }
+  .gap-8 { display:flex; gap:8px; }
+  .mb-8 { margin-bottom:8px; }
+  .mb-12 { margin-bottom:12px; }
+
+  details summary {
+    cursor:pointer; padding:8px 0; font-weight:600; color:#3f1d1d; font-size:14px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===========================================================
+     登入畫面
+=========================================================== -->
+<div id="view-login" class="login-bg">
+  <div class="login-card">
+    <img class="login-logo" src="images/logo.png" alt="Three Pugs Staff" onerror="this.style.display='none'">
+    <h1>THREE PUGS STAFF</h1>
+    <div class="sub">餐廳營業回報系統 · 請輸入密碼登入</div>
+    <input id="pad-display" class="pad-display" type="password" inputmode="numeric" placeholder="••••" autocomplete="off" />
+    <div id="login-preview" class="login-preview" style="display:none;">
+      <img id="login-pre-ava" src="">
+      <div>
+        <div class="nm" id="login-pre-name"></div>
+        <div class="rl" id="login-pre-role"></div>
+      </div>
+    </div>
+    <div class="pad-grid">
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
+      <button class="fn" id="pad-clear">清除</button>
+      <button data-k="0">0</button>
+      <button class="fn" id="pad-back">←</button>
+    </div>
+    <div style="margin-top:14px;">
+      <button class="btn" id="btn-login">登入</button>
+    </div>
+    <div class="err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- ===========================================================
+     主應用
+=========================================================== -->
+<div id="app" style="display:none;">
+  <div class="topbar">
+    <div class="brand">
+      <img src="images/logo.png" alt="logo" onerror="this.style.visibility='hidden'">
+      <div class="titles">
+        <h1>THREE PUGS STAFF</h1>
+        <div class="sub">營業回報系統</div>
+      </div>
+    </div>
+    <div class="who-block">
+      <img class="avatar" id="topbar-avatar" src="" onerror="this.style.visibility='hidden'">
+      <div class="who" id="who"></div>
+      <button class="btn-logout" id="btn-logout">登出</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ======================= Dashboard ======================= -->
+    <section id="view-dashboard" style="display:none;">
+      <div class="kpi-grid mb-12">
+        <div class="kpi">
+          <div class="label">本週累積（餐廳）</div>
+          <div class="val" id="kpi-week-rev">—</div>
+          <div class="meta" id="kpi-week-rev-meta">/ — 目標</div>
+          <div class="progress" id="kpi-week-progress"><span style="width:0%"></span></div>
+        </div>
+        <div class="kpi alt">
+          <div class="label">本週達成率</div>
+          <div class="val" id="kpi-week-pct">—</div>
+          <div class="meta">餐廳營業額 vs 目標</div>
+        </div>
+      </div>
+
+      <div class="kpi-grid mb-12">
+        <div class="card" style="margin:0;">
+          <div class="sub">本月餐廳累積</div>
+          <div style="font-size:20px;font-weight:700;color:#7a1f1f;" id="kpi-month-rev">—</div>
+          <div class="sub" id="kpi-month-meta">— / —</div>
+        </div>
+        <div class="card" style="margin:0;">
+          <div class="sub">本月餐車累積</div>
+          <div style="font-size:20px;font-weight:700;color:#a83232;" id="kpi-month-cart">—</div>
+          <div class="sub" id="kpi-month-cart-meta">租金累積：—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="display:flex;justify-content:space-between;align-items:center;">
+          <span>本週每日（週一 ~ 週日）</span>
+          <span class="small" id="week-range"></span>
+        </h2>
+        <div style="overflow-x:auto;">
+          <table class="week-table" id="week-table">
+            <thead>
+              <tr><th>日期</th><th>目標</th><th>實績</th><th>達成%</th><th>人時</th><th>人力%</th><th>備註</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" onclick="go('form')">填寫今日</button>
+        <button class="btn btn-secondary" onclick="refreshAll(true)">重新整理</button>
+      </div>
+    </section>
+
+    <!-- ======================= 填寫表單 ======================= -->
+    <section id="view-form" style="display:none;">
+      <div class="card">
+        <h2>填寫營業回報</h2>
+        <div class="form-row">
+          <label>日期</label>
+          <input type="date" id="f-date">
+        </div>
+
+        <div class="form-row" id="f-type-wrap">
+          <label>類型</label>
+          <div class="seg" id="f-type">
+            <button data-v="餐廳" class="active">餐廳</button>
+            <button data-v="餐車">餐車</button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>當日營業額（元）</label>
+          <input type="number" id="f-rev" inputmode="numeric" placeholder="例如 17000">
+        </div>
+
+        <div class="form-row">
+          <label>實際人力時數（小時）</label>
+          <input type="number" id="f-lab" inputmode="decimal" step="0.5" placeholder="例如 24">
+        </div>
+
+        <div class="form-row" id="f-rent-wrap" style="display:none;">
+          <label>租金（餐車當日租金，元）</label>
+          <input type="number" id="f-rent" inputmode="numeric" placeholder="例如 1000">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>食材報廢（可不填）</h2>
+        <div class="small mb-8">當天有報廢的食材直接填入「數量」，沒有就留白即可。系統會自動依「單位成本 × 數量」算出損失金額。</div>
+        <div style="overflow-x:auto;">
+          <table class="waste-table" id="waste-table">
+            <thead>
+              <tr><th>食材</th><th>數量</th><th>單位</th><th>金額</th><th>原因</th></tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="waste-summary">
+          <span>本日報廢成本</span>
+          <span style="font-weight:700;color:#7a1f1f;font-size:16px;">$<span id="f-waste-total">0</span></span>
+        </div>
+        <div id="form-warning" style="display:none;margin-top:14px;padding:12px;border-radius:10px;background:#fff5d6;border:1px solid #fbbf24;color:#854d0e;font-size:14px;line-height:1.6;"></div>
+        <div class="form-row" style="margin-top:12px;">
+          <label>整體備註（可選）</label>
+          <textarea id="f-waste-note" placeholder="例如：天氣影響、需求估錯…"></textarea>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="go('dashboard')">取消</button>
+        <button class="btn" id="btn-submit">送出</button>
+      </div>
+    </section>
+
+    <!-- ======================= 紀錄列表 ======================= -->
+    <section id="view-records" style="display:none;">
+      <div class="card">
+        <h2>歷史紀錄</h2>
+        <div class="filter-row">
+          <input type="month" id="rec-month">
+          <select id="rec-type">
+            <option value="">全部類型</option>
+            <option>餐廳</option>
+            <option>餐車</option>
+          </select>
+          <select id="rec-user">
+            <option value="">全部填寫人</option>
+          </select>
+        </div>
+        <div id="rec-list"></div>
+      </div>
+    </section>
+
+    <!-- ======================= 月份 ======================= -->
+    <section id="view-month" style="display:none;">
+      <div class="card">
+        <h2>月份報表</h2>
+        <div class="form-row">
+          <label>選擇月份</label>
+          <input type="month" id="month-pick">
+        </div>
+        <div class="kpi-grid mb-12">
+          <div class="kpi">
+            <div class="label">餐廳累積</div>
+            <div class="val" id="m-rest-rev">—</div>
+            <div class="meta" id="m-rest-meta">/ — 目標</div>
+            <div class="progress" id="m-rest-prog"><span style="width:0%"></span></div>
+          </div>
+          <div class="kpi warm">
+            <div class="label">餐車累積</div>
+            <div class="val" id="m-cart-rev">—</div>
+            <div class="meta" id="m-cart-meta">租金 —</div>
+          </div>
+        </div>
+        <div class="kpi-grid mb-12">
+          <div class="kpi amber">
+            <div class="label">本月食材報廢</div>
+            <div class="val" id="m-waste-cost">—</div>
+            <div class="meta" id="m-waste-meta">—</div>
+          </div>
+          <div class="card" style="margin:0;">
+            <div class="sub">報廢前 3 名</div>
+            <div id="m-waste-top" style="font-size:13px;line-height:1.6;color:#3f1d1d;"></div>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="week-table" id="month-table">
+            <thead><tr><th>日期</th><th>目標</th><th>餐廳</th><th>餐車</th><th>達成%</th><th>人時</th><th>人力%</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================= 管理員 ======================= -->
+    <section id="view-admin" style="display:none;">
+      <div class="tabs">
+        <button class="active" data-tab="targets">目標</button>
+        <button data-tab="waste">食材清單</button>
+        <button data-tab="users">登入帳號</button>
+      </div>
+
+      <div id="admin-targets">
+        <div class="card">
+          <h2>每日目標（餐廳）</h2>
+          <div class="small mb-8">餐車不設目標，只記錄。下方按月份檢視，可批次修改後一次儲存。</div>
+          <div class="filter-row">
+            <input type="month" id="tg-month">
+            <button class="btn btn-secondary" id="btn-import-default" style="flex:1;">匯入預設目標 (4/25 ~ 5/31)</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="week-table" id="tg-table">
+              <thead><tr><th>日期</th><th>星期</th><th>備料?</th><th>目標 (元)</th><th>假日</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div style="margin-top:12px;"><button class="btn" id="btn-save-targets">儲存目標</button></div>
+        </div>
+        <div class="card">
+          <h2>匯入歷史累計 (4/1 ~ 4/19)</h2>
+          <div class="small mb-8">過去三週不逐日填寫，整段累計：餐廳目標 $750,000，已達成 $353,159。</div>
+          <button class="btn btn-secondary" id="btn-import-history">匯入歷史累計</button>
+        </div>
+
+        <div class="card">
+          <h2>匯入每日歷史資料 (4/20 ~ 4/24)</h2>
+          <div class="small mb-8">把 4/20 ~ 4/24 五天的資料一次寫入（餐廳營業額、人時）。</div>
+          <ul class="small" style="margin:8px 0;padding-left:20px;line-height:1.7;">
+            <li>4/20 (一) 17,824 元 / 25h</li>
+            <li>4/21 (二) 備料日 / 24h</li>
+            <li>4/22 (三) 34,782 元 / 30h</li>
+            <li>4/23 (四) 18,546 元 / 36h</li>
+            <li>4/24 (五) 17,443 元 / 30h</li>
+          </ul>
+          <button class="btn btn-secondary" id="btn-import-sample">匯入示範資料</button>
+        </div>
+      </div>
+
+      <div id="admin-waste" style="display:none;">
+        <div class="card">
+          <h2>食材報廢清單</h2>
+          <div class="small mb-8">設定員工填表時可勾選的食材（名稱、單位、單位成本）。</div>
+          <div style="overflow-x:auto;">
+            <table class="waste-table" id="waste-edit-table">
+              <thead><tr><th>食材名稱</th><th>單位</th><th>單位成本</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="btn-row" style="margin-top:10px;">
+            <button class="btn btn-secondary" id="btn-import-waste">匯入預設清單</button>
+            <button class="btn btn-secondary" id="btn-add-waste">新增</button>
+            <button class="btn" id="btn-save-waste">儲存</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="admin-users" style="display:none;">
+        <div class="card">
+          <h2>登入帳號</h2>
+          <div class="small mb-8">密碼寫在前端與後端的 USERS 設定中，要修改請同時編輯 index.html 與 apps-script.gs。</div>
+          <table class="week-table">
+            <thead><tr><th></th><th>密碼</th><th>姓名</th><th>角色</th></tr></thead>
+            <tbody id="admin-user-list"></tbody>
+          </table>
+          <div class="small" style="margin-top:8px;">
+            • admin / manager 可以編輯、刪除任何回報、設定目標、管理食材清單。<br>
+            • staff 只能填寫當日回報、查看儀表板。<br>
+            • 小江登入後可選填「餐廳」或「餐車」；其他人預設只能填「餐廳」。
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- 底部導航 -->
+  <nav class="navbar" id="navbar">
+    <a href="#" data-go="dashboard"><span class="ico">📊</span><span>儀表板</span></a>
+    <a href="#" data-go="form"><span class="ico">✏️</span><span>填寫</span></a>
+    <a href="#" data-go="records"><span class="ico">📋</span><span>紀錄</span></a>
+    <a href="#" data-go="month"><span class="ico">📅</span><span>月份</span></a>
+    <a href="#" data-go="admin" id="nav-admin"><span class="ico">⚙️</span><span>管理</span></a>
+  </nav>
+</div>
+
+<!-- toast & modal mount -->
+<div class="toast" id="toast"></div>
+<div id="modal-root"></div>
+
+<script>
+/* =========================================================
+ *  設定（部署後請修改 API_URL）
+ * ========================================================= */
+const API_URL = 'https://script.google.com/macros/s/AKfycbzeByytb23hFJ1MR4AxvKxInNW_DsB3a6asW9tZiCPpnynDcAzB1rhQWmlqfy1DJMP9/exec';
+
+const USERS = {
+  '8888': { name: '管理員', role: 'admin'   },
+  '0000': { name: '汪穎',   role: 'manager' },
+  '1111': { name: '小江',   role: 'manager' },
+  '3333': { name: '阿威',   role: 'staff'   },
+  '6666': { name: 'Kevin',  role: 'staff'   }
+};
+
+/* 頭像對應 — 對應 images/ 資料夾內的檔案 */
+const AVATARS = {
+  '管理員': 'images/logo.png',           // 管理員沿用品牌 LOGO
+  '汪穎':   'images/avatar-wangying.png',
+  '小江':   'images/avatar-xiaojiang.jpg',
+  '阿威':   'images/avatar-awei.png',
+  'Kevin':  'images/avatar-kevin.png'
+};
+
+/* 人力成本：每小時 $200（要改數字直接改這行即可） */
+const LABOR_HOURLY_COST = 200;
+
+/* 示範歷史資料：4/20 ~ 4/24（管理員可一鍵匯入） */
+const SAMPLE_REPORTS = [
+  { date:'2026-04-20', type:'餐廳', revenue:17824, laborHours:25, rent:0, wasteItems:[], wasteNote:'示範資料' },
+  { date:'2026-04-21', type:'餐廳', revenue:0,     laborHours:24, rent:0, wasteItems:[], wasteNote:'示範資料·備料日' },
+  { date:'2026-04-22', type:'餐廳', revenue:34782, laborHours:30, rent:0, wasteItems:[], wasteNote:'示範資料' },
+  { date:'2026-04-23', type:'餐廳', revenue:18546, laborHours:36, rent:0, wasteItems:[], wasteNote:'示範資料' },
+  { date:'2026-04-24', type:'餐廳', revenue:17443, laborHours:30, rent:0, wasteItems:[], wasteNote:'示範資料' }
+];
+
+/* 預設歷史累計資料（不逐日填寫，整段累計）：
+ * 4/1 ~ 4/19 餐廳累計：目標 $750,000，已達成 $353,159
+ * 管理員可在「管理 → 目標」一鍵匯入 */
+const HISTORY_AGGREGATES = [
+  {
+    id: 'A_2026_04_pre',
+    periodStart: '2026-04-01',
+    periodEnd:   '2026-04-19',
+    type:        '餐廳',
+    revenue:     353159,
+    revenueTarget: 750000,
+    note:        '4/1~4/19 累計（每日資料未逐日輸入）'
+  }
+];
+
+/* 預設食材報廢清單（含單位成本，可在管理介面修改） */
+const DEFAULT_WASTE_ITEMS = [
+  { itemId:'W1', itemName:'漢堡麵包',  unit:'個',  unitCost:16,  active:true },
+  { itemId:'W2', itemName:'熱狗麵包',  unit:'條',  unitCost:6,   active:true },
+  { itemId:'W3', itemName:'生菜',      unit:'一斤',unitCost:70,  active:true },
+  { itemId:'W4', itemName:'菇醬',      unit:'包',  unitCost:250, active:true },
+  { itemId:'W5', itemName:'魚片',      unit:'片',  unitCost:70,  active:true },
+  { itemId:'W6', itemName:'漢堡肉排',  unit:'片',  unitCost:30,  active:true },
+  { itemId:'W7', itemName:'雞堡',      unit:'片',  unitCost:30,  active:true },
+  { itemId:'W8', itemName:'其他',      unit:'',    unitCost:0,   active:true }
+];
+
+/* 預設目標：2026/4/20 ~ 5/31（包含示範資料的 4/20~4/24） */
+const DEFAULT_TARGETS = (function () {
+  const wkMap = ['日','一','二','三','四','五','六'];
+  const map = {};
+  function ymd(d){ return d.toISOString().substring(0,10); }
+  const start = new Date('2026-04-20T00:00:00');
+  const end   = new Date('2026-05-31T00:00:00');
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate()+1)) {
+    const wk = d.getDay();
+    let rev = 0, prep = false, holiday = '';
+    if (wk === 1) rev = 17000;
+    else if (wk === 2) prep = true;
+    else if (wk === 3) rev = 17000;
+    else if (wk === 4) rev = 26000;
+    else if (wk === 5) rev = 34000;
+    else if (wk === 6) rev = 43000;
+    else if (wk === 0) rev = 34000;
+    if (ymd(d) === '2026-05-01') { rev = 38000; holiday = '勞動節'; }
+    map[ymd(d)] = { date: ymd(d), weekday: wkMap[wk], isPrepDay: prep, revenueTarget: rev, holidayName: holiday, laborHourTarget: 0, note: '' };
+  }
+  return map;
+})();
+
+/* =========================================================
+ *  狀態 & 工具
+ * ========================================================= */
+const State = {
+  user: null,
+  reports: [],
+  targets: [],
+  wasteItems: [],
+  aggregates: [],
+  currentView: 'dashboard'
+};
+
+function $(s, root){ return (root||document).querySelector(s); }
+function $all(s, root){ return Array.from((root||document).querySelectorAll(s)); }
+function fmtNT(v){ const n = Number(v||0); return n.toLocaleString('zh-TW', {maximumFractionDigits:0}); }
+function pad2(n){ return String(n).padStart(2,'0'); }
+function dateOnly(d){
+  if (!d) return '';
+  if (typeof d === 'string') return d.substring(0,10);
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+}
+function todayStr(){ return dateOnly(new Date()); }
+function startOfWeek(d){
+  const x = new Date(d);
+  const wk = (x.getDay() + 6) % 7;  // 週一=0
+  x.setDate(x.getDate() - wk);
+  x.setHours(0,0,0,0);
+  return x;
+}
+function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate()+n); return x; }
+function weekdayShort(d){ return ['日','一','二','三','四','五','六'][d.getDay()]; }
+function avatarFor(name){ return AVATARS[name] || ''; }
+
+function toast(msg){
+  const el = $('#toast'); el.textContent = msg; el.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(()=>el.classList.remove('show'), 2200);
+}
+
+/* =========================================================
+ *  API 呼叫
+ * ========================================================= */
+async function api(action, payload){
+  if (!API_URL || API_URL.indexOf('請填入') >= 0) {
+    throw new Error('尚未設定 API_URL，請編輯 index.html 最上方的 API_URL 常數');
+  }
+  const body = Object.assign({ action }, payload || {});
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(body)
+  });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error || '伺服器錯誤');
+  return json;
+}
+
+/* =========================================================
+ *  登入流程
+ * ========================================================= */
+function setupLogin(){
+  const display = $('#pad-display');
+  $all('.pad-grid button[data-k]').forEach(b => {
+    b.addEventListener('click', ()=>{
+      if (display.value.length < 8) display.value += b.dataset.k;
+      updateLoginPreview();
+    });
+  });
+  $('#pad-back').addEventListener('click', ()=>{ display.value = display.value.slice(0,-1); updateLoginPreview(); });
+  $('#pad-clear').addEventListener('click', ()=>{ display.value = ''; updateLoginPreview(); });
+  display.addEventListener('input', updateLoginPreview);
+  $('#btn-login').addEventListener('click', doLogin);
+  display.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+}
+function updateLoginPreview(){
+  const v = $('#pad-display').value.trim();
+  const u = USERS[v];
+  const pre = $('#login-preview');
+  if (u) {
+    pre.style.display = '';
+    const ava = avatarFor(u.name);
+    $('#login-pre-ava').src = ava;
+    $('#login-pre-ava').onerror = function(){ this.style.visibility='hidden'; };
+    $('#login-pre-name').textContent = u.name;
+    $('#login-pre-role').textContent = '角色：' + (u.role==='admin'?'管理員':u.role==='manager'?'幹部':'員工');
+  } else {
+    pre.style.display = 'none';
+  }
+}
+
+async function doLogin(){
+  const pwd = $('#pad-display').value.trim();
+  const u = USERS[pwd];
+  if (!u) { $('#login-err').textContent = '密碼錯誤'; return; }
+  $('#login-err').textContent = '';
+  State.user = Object.assign({ password: pwd }, u);
+  localStorage.setItem('biz_user', JSON.stringify(State.user));
+  await afterLogin();
+}
+
+function logout(){
+  State.user = null;
+  localStorage.removeItem('biz_user');
+  $('#view-login').style.display = '';
+  $('#app').style.display = 'none';
+  $('#pad-display').value = '';
+  $('#login-preview').style.display = 'none';
+}
+
+async function afterLogin(){
+  $('#view-login').style.display = 'none';
+  $('#app').style.display = '';
+  $('#who').textContent = State.user.name;
+  const ava = avatarFor(State.user.name);
+  const av = $('#topbar-avatar');
+  av.style.visibility = '';
+  av.src = ava;
+  av.onerror = function(){ this.style.visibility='hidden'; };
+
+  $('#nav-admin').style.display = (State.user.role === 'admin' || State.user.role === 'manager') ? '' : 'none';
+  const cols = (State.user.role === 'admin' || State.user.role === 'manager') ? 5 : 4;
+  $('#navbar').style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+  go('dashboard');
+  await refreshAll(false);
+}
+
+/* =========================================================
+ *  全域導覽
+ * ========================================================= */
+function go(view){
+  State.currentView = view;
+  ['dashboard','form','records','month','admin'].forEach(v=>{
+    const el = $('#view-' + v); if (el) el.style.display = (v===view) ? '' : 'none';
+  });
+  $all('.navbar a').forEach(a => a.classList.toggle('active', a.dataset.go === view));
+  // 立即先用本地快取渲染（瞬間顯示）
+  if (view === 'dashboard') renderDashboard();
+  if (view === 'form')      renderForm();
+  if (view === 'records')   renderRecords();
+  if (view === 'month')     renderMonth();
+  if (view === 'admin')     renderAdmin();
+  // 切換頁面後立即從 Google 雲端拉最新資料（refreshAll 會在抓到後自動重繪畫面）
+  refreshAll(false).catch(()=>{});
+}
+
+document.addEventListener('click', e=>{
+  const a = e.target.closest('.navbar a');
+  if (a) { e.preventDefault(); go(a.dataset.go); }
+});
+
+/* =========================================================
+ *  抓資料
+ * ========================================================= */
+async function refreshAll(showToast){
+  try {
+    const res = await api('getAllData', {});
+    State.reports = res.reports || [];
+    State.targets = res.targets || [];
+    State.wasteItems = res.wasteItems || [];
+    State.aggregates = res.aggregates || [];
+    localStorage.setItem('biz_cache', JSON.stringify({
+      ts: Date.now(),
+      reports: State.reports,
+      targets: State.targets,
+      wasteItems: State.wasteItems,
+      aggregates: State.aggregates
+    }));
+    if (showToast) toast('已更新');
+    if (State.currentView === 'dashboard') renderDashboard();
+    if (State.currentView === 'records')   renderRecords();
+    if (State.currentView === 'month')     renderMonth();
+    if (State.currentView === 'admin')     renderAdmin();
+    if (State.currentView === 'form')      renderForm();
+  } catch (e) {
+    const c = JSON.parse(localStorage.getItem('biz_cache') || 'null');
+    if (c) {
+      State.reports = c.reports; State.targets = c.targets; State.wasteItems = c.wasteItems;
+      State.aggregates = c.aggregates || [];
+      toast('離線顯示快取資料');
+    } else {
+      toast('讀取失敗：' + e.message);
+    }
+  }
+}
+
+/* =========================================================
+ *  Dashboard
+ * ========================================================= */
+function targetByDate(date){
+  return State.targets.find(t => dateOnly(t.Date) === date);
+}
+function reportsByDate(date, type){
+  return State.reports.filter(r =>
+    dateOnly(r.Date) === date && (!type || r.Type === type)
+  );
+}
+function sumRevenue(reports){ return reports.reduce((a,r)=>a + (Number(r.Revenue)||0), 0); }
+function sumLabor(reports){   return reports.reduce((a,r)=>a + (Number(r.LaborHours)||0), 0); }
+function sumRent(reports){    return reports.reduce((a,r)=>a + (Number(r.Rent)||0), 0); }
+function sumWasteCost(reports){ return reports.reduce((a,r)=>a + (Number(r.WasteCost)||0), 0); }
+function laborCost(hours){ return (Number(hours)||0) * LABOR_HOURLY_COST; }
+function laborPct(hours, revenue){
+  const cost = laborCost(hours);
+  const rev = Number(revenue)||0;
+  if (rev <= 0) return null;
+  return Math.round(cost / rev * 1000) / 10;  // 一位小數
+}
+function existingReport(date, type){
+  return State.reports.find(r => dateOnly(r.Date) === date && r.Type === type);
+}
+
+function renderDashboard(){
+  const today = new Date();
+  const monday = startOfWeek(today);
+  const days = [];
+  for (let i=0;i<7;i++) days.push(addDays(monday, i));
+
+  const tbody = $('#week-table tbody');
+  tbody.innerHTML = '';
+  let weekTargetSum = 0, weekRevRest = 0;
+
+  days.forEach(d => {
+    const ds = dateOnly(d);
+    const tg = targetByDate(ds);
+    const isPrep = tg && (tg.IsPrepDay === 'Y' || tg.IsPrepDay === true);
+    const tgVal = isPrep ? 0 : (tg ? Number(tg.RevenueTarget||0) : 0);
+    const restRev = sumRevenue(reportsByDate(ds, '餐廳'));
+    const cartRev = sumRevenue(reportsByDate(ds, '餐車'));
+    const lab = sumLabor(reportsByDate(ds));
+    const hasWaste = State.reports.some(r => dateOnly(r.Date)===ds && (r.HasWaste==='Y'||r.HasWaste===true));
+    weekTargetSum += tgVal;
+    weekRevRest += restRev;
+
+    const pct = tgVal > 0 ? Math.round(restRev / tgVal * 100) : null;
+    let pctClass = 'pct';
+    if (pct !== null) pctClass += pct >= 100 ? ' ok' : (pct >= 80 ? ' warn' : ' bad');
+
+    const tr = document.createElement('tr');
+    if (ds === todayStr()) tr.className = 'today';
+    if (isPrep) tr.className = (tr.className + ' prep').trim();
+
+    const lp = laborPct(lab, restRev);
+    let lpClass = 'pct';
+    if (lp !== null) lpClass += lp <= 30 ? ' ok' : (lp <= 40 ? ' warn' : ' bad');
+
+    tr.innerHTML = `
+      <td>${ds.substring(5)} (${weekdayShort(d)}) ${tg && tg.HolidayName ? '<span class="badge badge-holiday">'+tg.HolidayName+'</span>' : ''}</td>
+      <td>${isPrep ? '備料日' : (tg ? fmtNT(tgVal) : '—')}</td>
+      <td>${restRev || cartRev ? `餐廳 ${fmtNT(restRev)}${cartRev?'<br><span class="small">餐車 '+fmtNT(cartRev)+'</span>':''}` : '—'}</td>
+      <td class="${pctClass}">${pct === null ? '—' : pct + '%'}</td>
+      <td>${lab ? lab : '—'}</td>
+      <td class="${lpClass}">${lp === null ? '—' : lp + '%'}</td>
+      <td>${hasWaste ? '<span class="badge badge-waste">浪費</span>' : ''}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  $('#week-range').textContent = `${dateOnly(monday).substring(5)} ~ ${dateOnly(addDays(monday,6)).substring(5)}`;
+  $('#kpi-week-rev').textContent = '$' + fmtNT(weekRevRest);
+  $('#kpi-week-rev-meta').textContent = `/ $${fmtNT(weekTargetSum)} 目標`;
+  const wpct = weekTargetSum > 0 ? Math.round(weekRevRest / weekTargetSum * 100) : 0;
+  $('#kpi-week-pct').textContent = weekTargetSum > 0 ? wpct + '%' : '—';
+  const prog = $('#kpi-week-progress');
+  prog.querySelector('span').style.width = Math.min(100, wpct) + '%';
+  prog.classList.remove('bad','warn');
+  if (wpct < 80) prog.classList.add('bad');
+  else if (wpct < 100) prog.classList.add('warn');
+
+  // 月份統計
+  const ym = todayStr().substring(0,7);
+  let mTarget = 0, mRest = 0, mCart = 0, mRent = 0;
+  State.targets.forEach(t => {
+    if (dateOnly(t.Date).startsWith(ym)) mTarget += Number(t.RevenueTarget||0);
+  });
+  State.reports.forEach(r => {
+    if (!dateOnly(r.Date).startsWith(ym)) return;
+    if (r.Type === '餐廳') mRest += Number(r.Revenue||0);
+    if (r.Type === '餐車') { mCart += Number(r.Revenue||0); mRent += Number(r.Rent||0); }
+  });
+  $('#kpi-month-rev').textContent = '$' + fmtNT(mRest);
+  $('#kpi-month-meta').textContent = `${mTarget>0 ? Math.round(mRest/mTarget*100) : 0}% / 目標 $${fmtNT(mTarget)}`;
+  $('#kpi-month-cart').textContent = '$' + fmtNT(mCart);
+  $('#kpi-month-cart-meta').textContent = `租金累積：$${fmtNT(mRent)}`;
+}
+
+/* =========================================================
+ *  填寫表單
+ * ========================================================= */
+function renderForm(){
+  $('#f-date').value = todayStr();
+
+  const isXiaojiang = State.user && State.user.name === '小江';
+  $('#f-type-wrap').style.display = isXiaojiang ? '' : 'none';
+  setSeg('#f-type', '餐廳');
+  $('#f-rev').value = '';
+  $('#f-lab').value = '';
+  $('#f-rent').value = '';
+  $('#f-waste-note').value = '';
+  toggleRent();
+  $('#f-date').onchange = checkDuplicate;
+  checkDuplicate();
+
+  const items = State.wasteItems.length ? State.wasteItems : DEFAULT_WASTE_ITEMS.map(x=>({
+    ItemID: x.itemId, ItemName: x.itemName, Unit: x.unit, UnitCost: x.unitCost, Active: 'Y'
+  }));
+  const tbody = $('#waste-table tbody'); tbody.innerHTML = '';
+  if (!items.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="small" style="padding:12px;">尚未設定食材清單。</td></tr>';
+  } else {
+    items.forEach(it => {
+      const tr = document.createElement('tr');
+      tr.dataset.id = it.ItemID;
+      tr.dataset.name = it.ItemName;
+      tr.dataset.unit = it.Unit || '';
+      tr.dataset.unitcost = it.UnitCost || 0;
+      const isOther = (it.ItemName === '其他');
+      tr.dataset.other = isOther ? '1' : '0';
+      if (isOther) {
+        // 「其他」列：食材名稱、單位、金額 都可以手填
+        tr.innerHTML = `
+          <td><input type="text" class="w-name" placeholder="自訂食材"></td>
+          <td><input type="number" class="w-qty" inputmode="decimal" min="0" step="0.5" placeholder="0"></td>
+          <td><input type="text" class="w-unit" placeholder="單位" style="width:60px;"></td>
+          <td class="amt"><input type="number" class="w-amt-input" inputmode="numeric" min="0" placeholder="金額"></td>
+          <td><input type="text" class="w-reason" placeholder="例：客退、損壞"></td>`;
+      } else {
+        tr.innerHTML = `
+          <td>${it.ItemName}</td>
+          <td><input type="number" class="w-qty" inputmode="decimal" min="0" step="0.5" placeholder="0"></td>
+          <td>${it.Unit || ''}</td>
+          <td class="amt"><span class="w-amt">0</span></td>
+          <td><input type="text" class="w-reason" placeholder="例：過期"></td>`;
+      }
+      tbody.appendChild(tr);
+    });
+    tbody.addEventListener('input', recalcWasteTotal);
+  }
+  recalcWasteTotal();
+}
+
+function checkDuplicate(){
+  const date = $('#f-date').value;
+  if (!date) return;
+  const type = $('#f-type-wrap').style.display === 'none' ? '餐廳' : getSeg('#f-type');
+  const ex = existingReport(date, type);
+  const banner = $('#form-warning');
+  const btn = $('#btn-submit');
+  const canEdit = State.user && (State.user.role === 'admin' || State.user.role === 'manager');
+  if (ex) {
+    btn.disabled = true;
+    banner.style.display = '';
+    banner.innerHTML = `⚠️ <b>${date}</b> 的「${type}」已被 <b>${ex.FilledBy}</b> 填寫過<br>
+      <span class="small">營業額 $${fmtNT(ex.Revenue)} · 人時 ${ex.LaborHours||0}</span><br>
+      ${canEdit
+        ? '<span class="small">如需修改，請至「紀錄」頁編輯或刪除舊資料。</span>'
+        : '<span class="small">如有錯誤，請聯絡管理員、汪穎或小江處理。</span>'}`;
+  } else {
+    btn.disabled = false;
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+  }
+}
+
+function recalcWasteTotal(){
+  let total = 0;
+  $all('#waste-table tbody tr').forEach(tr => {
+    let amt = 0;
+    if (tr.dataset.other === '1') {
+      // 「其他」列：直接讀手填金額
+      amt = Number((tr.querySelector('.w-amt-input')||{}).value || 0);
+    } else {
+      const qty = Number((tr.querySelector('.w-qty')||{}).value || 0);
+      const uc  = Number(tr.dataset.unitcost || 0);
+      amt = qty * uc;
+      const span = tr.querySelector('.w-amt');
+      if (span) span.textContent = fmtNT(amt);
+    }
+    total += amt;
+  });
+  $('#f-waste-total').textContent = fmtNT(total);
+}
+
+function setSeg(sel, value){
+  $all(sel + ' button').forEach(b => b.classList.toggle('active', b.dataset.v === value));
+}
+function getSeg(sel){
+  const b = $(sel + ' button.active'); return b ? b.dataset.v : '';
+}
+function toggleRent(){
+  const isCart = getSeg('#f-type') === '餐車';
+  $('#f-rent-wrap').style.display = isCart ? '' : 'none';
+}
+
+document.addEventListener('click', e=>{
+  const segBtn = e.target.closest('#f-type button');
+  if (segBtn) {
+    Array.from(segBtn.parentElement.querySelectorAll('button')).forEach(b=>b.classList.remove('active'));
+    segBtn.classList.add('active');
+    toggleRent();
+    checkDuplicate();
+  }
+});
+
+$('#btn-submit').addEventListener('click', ()=>{
+  const date = $('#f-date').value;
+  const type = $('#f-type-wrap').style.display === 'none' ? '餐廳' : getSeg('#f-type');
+  const rev = Number($('#f-rev').value || 0);
+  const lab = Number($('#f-lab').value || 0);
+  const rent = Number($('#f-rent').value || 0);
+  const wasteNote = $('#f-waste-note').value.trim();
+
+  // 蒐集填了數量的食材（「其他」列：依手填金額或數量判斷是否要記錄）
+  const wasteItems = [];
+  $all('#waste-table tbody tr').forEach(tr => {
+    const qty = Number((tr.querySelector('.w-qty')||{}).value || 0);
+    if (tr.dataset.other === '1') {
+      const customName = ((tr.querySelector('.w-name')||{}).value || '').trim();
+      const customUnit = ((tr.querySelector('.w-unit')||{}).value || '').trim();
+      const customAmt  = Number((tr.querySelector('.w-amt-input')||{}).value || 0);
+      // 只有在「金額 > 0」或「數量 > 0 且有名稱」時才記錄
+      if (customAmt > 0 || (qty > 0 && customName)) {
+        wasteItems.push({
+          id: tr.dataset.id,
+          name: customName || '其他',
+          unit: customUnit,
+          qty: qty,
+          unitCost: 0,
+          amount: customAmt,
+          reason: (tr.querySelector('.w-reason')||{}).value || ''
+        });
+      }
+    } else if (qty > 0) {
+      const uc = Number(tr.dataset.unitcost || 0);
+      wasteItems.push({
+        id: tr.dataset.id,
+        name: tr.dataset.name,
+        unit: tr.dataset.unit,
+        qty: qty,
+        unitCost: uc,
+        amount: qty * uc,
+        reason: (tr.querySelector('.w-reason')||{}).value || ''
+      });
+    }
+  });
+
+  if (!date) return toast('請選擇日期');
+  if ($('#f-rev').value === '') return toast('請輸入營業額（沒有營業也請填 0）');
+
+  // 雙重防呆：送出時再檢查一次本日同類型是否已被填寫
+  const dup = existingReport(date, type);
+  if (dup) {
+    toast(`本日 ${type} 已由 ${dup.FilledBy} 填寫過，無法重複`);
+    checkDuplicate();
+    return;
+  }
+
+  const wasteTotal = wasteItems.reduce((a,w)=>a+w.amount, 0);
+  const lcost = laborCost(lab);
+  const lpct = laborPct(lab, rev);
+
+  showConfirm({
+    title: '確認送出？',
+    rows: [
+      ['日期', date],
+      ['類型', type],
+      ['營業額', '$' + fmtNT(rev)],
+      ['人時', lab + ' 小時'],
+      ['人力成本', '$' + fmtNT(lcost) + (lpct !== null ? `（佔 ${lpct}%）` : '')],
+      ...(type === '餐車' ? [['租金', '$' + fmtNT(rent)]] : []),
+      ['食材報廢', wasteItems.length ? `${wasteItems.length} 項 (成本 $${fmtNT(wasteTotal)})` : '無']
+    ],
+    confirmText: '確認送出',
+    onConfirm: async ()=>{
+      try {
+        await api('submitReport', {
+          password: State.user.password,
+          date, type,
+          revenue: rev,
+          laborHours: lab,
+          rent: rent,
+          wasteItems: wasteItems,
+          wasteNote: wasteNote
+        });
+        toast('送出成功');
+        await refreshAll(false);
+        go('dashboard');
+      } catch (e) { toast('送出失敗：' + e.message); }
+    }
+  });
+});
+
+/* =========================================================
+ *  Confirm Modal
+ * ========================================================= */
+function showConfirm({ title, rows, confirmText='確認', cancelText='取消', onConfirm, danger }){
+  const root = $('#modal-root');
+  root.innerHTML = `
+    <div class="modal-mask">
+      <div class="modal">
+        <h3>${title}</h3>
+        ${rows.map(([k,v])=>`<div class="row"><span class="lbl">${k}</span><span>${v}</span></div>`).join('')}
+        <div class="btn-row" style="margin-top:14px;">
+          <button class="btn btn-secondary" id="m-cancel">${cancelText}</button>
+          <button class="btn ${danger?'btn-danger':''}" id="m-ok">${confirmText}</button>
+        </div>
+      </div>
+    </div>`;
+  $('#m-cancel').onclick = ()=> root.innerHTML = '';
+  $('#m-ok').onclick = async ()=>{
+    root.innerHTML = '';
+    if (onConfirm) await onConfirm();
+  };
+}
+
+/* =========================================================
+ *  紀錄列表 + 編輯/刪除
+ * ========================================================= */
+function renderRecords(){
+  const monthInput = $('#rec-month');
+  if (!monthInput.value) monthInput.value = todayStr().substring(0,7);
+  const names = Array.from(new Set(State.reports.map(r => r.FilledBy).filter(Boolean)));
+  const sel = $('#rec-user');
+  sel.innerHTML = '<option value="">全部填寫人</option>' + names.map(n=>`<option>${n}</option>`).join('');
+  drawRecords();
+  monthInput.onchange = drawRecords;
+  $('#rec-type').onchange = drawRecords;
+  sel.onchange = drawRecords;
+}
+function drawRecords(){
+  const ym = $('#rec-month').value;
+  const tp = $('#rec-type').value;
+  const us = $('#rec-user').value;
+  const list = State.reports
+    .filter(r => dateOnly(r.Date).startsWith(ym))
+    .filter(r => !tp || r.Type === tp)
+    .filter(r => !us || r.FilledBy === us)
+    .sort((a,b)=> dateOnly(b.Date).localeCompare(dateOnly(a.Date)) || String(b.SubmittedAt).localeCompare(String(a.SubmittedAt)));
+  const root = $('#rec-list');
+  if (!list.length) { root.innerHTML = '<div class="empty">沒有資料</div>'; return; }
+  const canEdit = State.user.role === 'admin' || State.user.role === 'manager';
+  root.innerHTML = list.map(r => {
+    let waste = '';
+    try {
+      const arr = JSON.parse(r.WasteItems || '[]');
+      if (arr.length) {
+        const items = arr.map(x => `${x.name} ${x.qty}${x.unit||''}${x.amount?' ($'+fmtNT(x.amount)+')':''}${x.reason?' ['+x.reason+']':''}`).join('、');
+        waste = `<div class="small" style="margin-top:4px;color:#b91c1c;">浪費：${items}${r.WasteNote?'（'+r.WasteNote+'）':''}</div>`;
+      }
+    } catch(_){}
+    const typeBadge = r.Type === '餐車'
+      ? '<span class="badge badge-cart">餐車</span>'
+      : '<span class="badge badge-restaurant">餐廳</span>';
+    const ava = avatarFor(r.FilledBy);
+    return `
+      <div class="rec">
+        <div>
+          <div class="top">
+            ${ava ? `<img class="mini-ava" src="${ava}" onerror="this.style.display='none'">` : ''}
+            ${dateOnly(r.Date)} · ${r.FilledBy} · ${typeBadge}
+          </div>
+          <div class="num">$${fmtNT(r.Revenue)}</div>
+          <div class="small">人時 ${r.LaborHours||0}h　人力 $${fmtNT(laborCost(r.LaborHours))}${(()=>{ const p=laborPct(r.LaborHours, r.Revenue); return p!==null ? ' ('+p+'%)' : ''; })()}${r.Type==='餐車' ? '　租金 $'+fmtNT(r.Rent||0) : ''}${r.WasteCost?'　報廢 $'+fmtNT(r.WasteCost):''}</div>
+          ${waste}
+        </div>
+        <div class="right">
+          ${canEdit ? `
+            <div class="actions">
+              <button onclick="editRec('${r.ID}')">編輯</button>
+              <button class="del" onclick="deleteRec('${r.ID}')">刪除</button>
+            </div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+window.editRec = function(id){
+  if (State.user.role !== 'admin' && State.user.role !== 'manager') return toast('無權限');
+  const r = State.reports.find(x => x.ID === id);
+  if (!r) return;
+  const root = $('#modal-root');
+  root.innerHTML = `
+    <div class="modal-mask">
+      <div class="modal">
+        <h3>編輯紀錄</h3>
+        <div class="form-row"><label>日期</label><input type="date" id="e-date" value="${dateOnly(r.Date)}"></div>
+        <div class="form-row"><label>類型</label>
+          <select id="e-type">
+            <option ${r.Type==='餐廳'?'selected':''}>餐廳</option>
+            <option ${r.Type==='餐車'?'selected':''}>餐車</option>
+          </select>
+        </div>
+        <div class="form-row"><label>營業額</label><input type="number" id="e-rev" value="${r.Revenue||0}"></div>
+        <div class="form-row"><label>人時</label><input type="number" id="e-lab" step="0.5" value="${r.LaborHours||0}"></div>
+        <div class="form-row"><label>租金（餐車用）</label><input type="number" id="e-rent" value="${r.Rent||0}"></div>
+        <div class="form-row"><label>備註</label><textarea id="e-note">${(r.WasteNote||'').replace(/</g,'&lt;')}</textarea></div>
+        <div class="small">食材報廢明細不在此處編輯，如需修正請刪除後重新填寫。</div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn btn-secondary" id="m-cancel">取消</button>
+          <button class="btn" id="m-ok">儲存</button>
+        </div>
+      </div>
+    </div>`;
+  $('#m-cancel').onclick = ()=> root.innerHTML = '';
+  $('#m-ok').onclick = async ()=>{
+    try {
+      await api('editReport', {
+        password: State.user.password,
+        id: r.ID,
+        changes: {
+          Date: $('#e-date').value,
+          Type: $('#e-type').value,
+          Revenue: Number($('#e-rev').value||0),
+          LaborHours: Number($('#e-lab').value||0),
+          Rent: Number($('#e-rent').value||0),
+          WasteNote: $('#e-note').value
+        }
+      });
+      root.innerHTML = '';
+      toast('已更新');
+      await refreshAll(false);
+    } catch (e) { toast('更新失敗：' + e.message); }
+  };
+};
+
+window.deleteRec = function(id){
+  if (State.user.role !== 'admin' && State.user.role !== 'manager') return toast('無權限');
+  const r = State.reports.find(x => x.ID === id);
+  if (!r) return;
+  showConfirm({
+    title: '確定刪除這筆紀錄？',
+    rows: [['日期', dateOnly(r.Date)], ['類型', r.Type], ['營業額', '$'+fmtNT(r.Revenue)], ['填寫人', r.FilledBy]],
+    confirmText: '確定刪除',
+    danger: true,
+    onConfirm: async ()=>{
+      try {
+        await api('deleteReport', { password: State.user.password, id });
+        toast('已刪除');
+        await refreshAll(false);
+      } catch (e) { toast('刪除失敗：' + e.message); }
+    }
+  });
+};
+
+/* =========================================================
+ *  月份報表
+ * ========================================================= */
+function renderMonth(){
+  const pick = $('#month-pick');
+  if (!pick.value) pick.value = todayStr().substring(0,7);
+  pick.onchange = drawMonth;
+  drawMonth();
+}
+function drawMonth(){
+  const ym = $('#month-pick').value;
+  const [yy, mm] = ym.split('-').map(Number);
+  const last = new Date(yy, mm, 0).getDate();
+  const monthStart = `${yy}-${pad2(mm)}-01`;
+  const monthEnd   = `${yy}-${pad2(mm)}-${pad2(last)}`;
+  const tbody = $('#month-table tbody'); tbody.innerHTML = '';
+  let mRest=0, mCart=0, mTar=0, mRent=0, mWasteCost=0;
+  const wasteAgg = {}; // name -> { qty, amount, unit }
+
+  // 加入「歷史累計」（Aggregates）：期間落在當月內的累計值
+  // 並把它顯示為表格第一列（標示為「歷史累計」）
+  const aggRows = (State.aggregates||[]).filter(a => {
+    const ps = dateOnly(a.PeriodStart), pe = dateOnly(a.PeriodEnd);
+    return ps <= monthEnd && pe >= monthStart;
+  });
+  aggRows.forEach(a => {
+    const rev = Number(a.Revenue||0);
+    const tg  = Number(a.RevenueTarget||0);
+    if ((a.Type||'餐廳') === '餐車') {
+      mCart += rev;
+    } else {
+      mRest += rev;
+      mTar  += tg;
+    }
+    const pct = tg>0 ? Math.round(rev/tg*100) : null;
+    let cls = 'pct';
+    if (pct!==null) cls += pct>=100 ? ' ok' : (pct>=80 ? ' warn' : ' bad');
+    const tr = document.createElement('tr');
+    tr.style.background = '#fff5d6';
+    const ps = dateOnly(a.PeriodStart).substring(5);
+    const pe = dateOnly(a.PeriodEnd).substring(5);
+    tr.innerHTML = `
+      <td><b>${ps}~${pe}</b><br><span class="small">歷史累計</span></td>
+      <td>${tg ? fmtNT(tg) : '—'}</td>
+      <td>${(a.Type||'餐廳')==='餐車' ? '—' : fmtNT(rev)}</td>
+      <td>${(a.Type||'餐廳')==='餐車' ? fmtNT(rev) : '—'}</td>
+      <td class="${cls}">${pct===null ? '—' : pct + '%'}</td>
+      <td>—</td>
+      <td>—</td>`;
+    tbody.appendChild(tr);
+  });
+  for (let d=1; d<=last; d++){
+    const ds = `${yy}-${pad2(mm)}-${pad2(d)}`;
+    const tg = targetByDate(ds);
+    const isPrep = tg && (tg.IsPrepDay==='Y' || tg.IsPrepDay===true);
+    const tgVal = isPrep ? 0 : (tg ? Number(tg.RevenueTarget||0) : 0);
+    const rest = sumRevenue(reportsByDate(ds, '餐廳'));
+    const cart = sumRevenue(reportsByDate(ds, '餐車'));
+    const rent = sumRent(reportsByDate(ds, '餐車'));
+    mRest += rest; mCart += cart; mTar += tgVal; mRent += rent;
+    // 累計報廢
+    reportsByDate(ds).forEach(r => {
+      mWasteCost += Number(r.WasteCost||0);
+      try {
+        (JSON.parse(r.WasteItems||'[]')).forEach(w => {
+          const k = w.name + (w.unit?'/'+w.unit:'');
+          if (!wasteAgg[k]) wasteAgg[k] = { qty:0, amount:0, unit:w.unit||'' , name: w.name };
+          wasteAgg[k].qty += Number(w.qty||0);
+          wasteAgg[k].amount += Number(w.amount||0);
+        });
+      } catch(_){}
+    });
+    const pct = tgVal>0 ? Math.round(rest/tgVal*100) : null;
+    let cls = 'pct';
+    if (pct!==null){ cls += pct>=100 ? ' ok' : (pct>=80 ? ' warn' : ' bad'); }
+    const lab = sumLabor(reportsByDate(ds));
+    const lp = laborPct(lab, rest);
+    let lpClass = 'pct';
+    if (lp !== null) lpClass += lp <= 30 ? ' ok' : (lp <= 40 ? ' warn' : ' bad');
+    const tr = document.createElement('tr');
+    if (ds === todayStr()) tr.className = 'today';
+    if (isPrep) tr.className = (tr.className + ' prep').trim();
+    tr.innerHTML = `
+      <td>${ds.substring(5)} (${weekdayShort(new Date(ds))})</td>
+      <td>${isPrep ? '備料日' : (tg ? fmtNT(tgVal) : '—')}</td>
+      <td>${rest ? fmtNT(rest) : '—'}</td>
+      <td>${cart ? fmtNT(cart) : '—'}</td>
+      <td class="${cls}">${pct===null ? '—' : pct + '%'}</td>
+      <td>${lab ? lab : '—'}</td>
+      <td class="${lpClass}">${lp===null ? '—' : lp + '%'}</td>`;
+    tbody.appendChild(tr);
+  }
+  $('#m-rest-rev').textContent = '$' + fmtNT(mRest);
+  $('#m-rest-meta').textContent = `${mTar>0?Math.round(mRest/mTar*100):0}% / 目標 $${fmtNT(mTar)}`;
+  const prog = $('#m-rest-prog'); prog.classList.remove('bad','warn');
+  const wpct = mTar>0 ? Math.round(mRest/mTar*100) : 0;
+  prog.querySelector('span').style.width = Math.min(100, wpct) + '%';
+  if (wpct<80) prog.classList.add('bad'); else if (wpct<100) prog.classList.add('warn');
+  $('#m-cart-rev').textContent = '$' + fmtNT(mCart);
+  $('#m-cart-meta').textContent = `租金 $${fmtNT(mRent)}`;
+  // 報廢統計
+  $('#m-waste-cost').textContent = '$' + fmtNT(mWasteCost);
+  const items = Object.values(wasteAgg).sort((a,b)=>b.amount-a.amount);
+  $('#m-waste-meta').textContent = `共 ${items.length} 項食材`;
+  if (!items.length) {
+    $('#m-waste-top').innerHTML = '<span class="small">本月尚無報廢紀錄</span>';
+  } else {
+    $('#m-waste-top').innerHTML = items.slice(0,3).map(x =>
+      `<div>${x.name} <span class="small">${x.qty}${x.unit}</span> · <span style="color:#7a1f1f;font-weight:600;">$${fmtNT(x.amount)}</span></div>`
+    ).join('');
+  }
+}
+
+/* =========================================================
+ *  管理員：tabs
+ * ========================================================= */
+function renderAdmin(){
+  if (State.user.role !== 'admin' && State.user.role !== 'manager') return toast('無權限');
+  $all('#view-admin .tabs button').forEach(b => {
+    b.onclick = ()=>{
+      $all('#view-admin .tabs button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      const t = b.dataset.tab;
+      $('#admin-targets').style.display = t==='targets'?'':'none';
+      $('#admin-waste').style.display   = t==='waste'?'':'none';
+      $('#admin-users').style.display   = t==='users'?'':'none';
+      if (t==='targets') renderAdminTargets();
+      if (t==='waste')   renderAdminWaste();
+      if (t==='users')   renderAdminUsers();
+    };
+  });
+  renderAdminTargets();
+  renderAdminUsers();
+}
+
+function renderAdminTargets(){
+  const pick = $('#tg-month');
+  if (!pick.value) pick.value = todayStr().substring(0,7);
+  pick.onchange = drawAdminTargets;
+  $('#btn-import-default').onclick = importDefaultTargets;
+  $('#btn-save-targets').onclick = saveAdminTargets;
+  const sb = $('#btn-import-sample');
+  if (sb) sb.onclick = importSampleData;
+  const hb = $('#btn-import-history');
+  if (hb) hb.onclick = importHistoryAggregates;
+  drawAdminTargets();
+}
+
+async function importHistoryAggregates(){
+  showConfirm({
+    title: '確認匯入歷史累計？',
+    rows: [
+      ['期間', '2026-04-01 ~ 2026-04-19'],
+      ['類型', '餐廳'],
+      ['目標', '$' + fmtNT(750000)],
+      ['已達成', '$' + fmtNT(353159)],
+      ['注意', '會覆寫雲端 Aggregates 工作表的所有歷史累計資料']
+    ],
+    confirmText: '匯入',
+    onConfirm: async ()=>{
+      try {
+        const items = HISTORY_AGGREGATES.map(a => ({
+          id: a.id, periodStart: a.periodStart, periodEnd: a.periodEnd,
+          type: a.type, revenue: a.revenue, revenueTarget: a.revenueTarget, note: a.note
+        }));
+        await api('setAggregates', { password: State.user.password, items });
+        toast('歷史累計已寫入雲端');
+        await refreshAll(false);
+      } catch (e) { toast('匯入失敗：' + e.message); }
+    }
+  });
+}
+
+async function importSampleData(){
+  showConfirm({
+    title: '確認匯入示範歷史資料？',
+    rows: [
+      ['日期範圍','2026-04-20 ~ 2026-04-24'],
+      ['筆數', String(SAMPLE_REPORTS.length)],
+      ['注意', '若該日已有同類型紀錄會被略過']
+    ],
+    confirmText: '匯入',
+    onConfirm: async ()=>{
+      let ok = 0, skip = 0;
+      for (const r of SAMPLE_REPORTS) {
+        if (existingReport(r.date, r.type)) { skip++; continue; }
+        try {
+          await api('submitReport', {
+            password: State.user.password,
+            date: r.date, type: r.type,
+            revenue: r.revenue, laborHours: r.laborHours, rent: r.rent,
+            wasteItems: r.wasteItems, wasteNote: r.wasteNote
+          });
+          ok++;
+          await refreshAll(false);
+        } catch (e) { /* skip on error */ }
+      }
+      toast(`匯入完成：成功 ${ok} 筆，略過 ${skip} 筆`);
+    }
+  });
+}
+function drawAdminTargets(){
+  const ym = $('#tg-month').value;
+  const [yy, mm] = ym.split('-').map(Number);
+  const last = new Date(yy, mm, 0).getDate();
+  const tbody = $('#tg-table tbody'); tbody.innerHTML = '';
+  for (let d=1; d<=last; d++){
+    const ds = `${yy}-${pad2(mm)}-${pad2(d)}`;
+    const tg = targetByDate(ds) || {};
+    const isPrep = (tg.IsPrepDay==='Y'||tg.IsPrepDay===true) ? 'Y' :
+                   (DEFAULT_TARGETS[ds] && DEFAULT_TARGETS[ds].isPrepDay ? 'Y' : 'N');
+    const tar = (tg.RevenueTarget != null && tg.RevenueTarget !== '') ? tg.RevenueTarget :
+                (DEFAULT_TARGETS[ds] ? DEFAULT_TARGETS[ds].revenueTarget : 0);
+    const hol = tg.HolidayName || (DEFAULT_TARGETS[ds] ? DEFAULT_TARGETS[ds].holidayName : '');
+    const wk = weekdayShort(new Date(ds));
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${ds.substring(5)}</td>
+      <td>${wk}</td>
+      <td><select data-d="${ds}" data-k="prep">
+        <option value="N" ${isPrep==='N'?'selected':''}>—</option>
+        <option value="Y" ${isPrep==='Y'?'selected':''}>備料日</option>
+      </select></td>
+      <td><input type="number" data-d="${ds}" data-k="rev" value="${tar||0}" style="width:90px;padding:4px;text-align:right;border:1px solid #d6c1ad;border-radius:6px;"></td>
+      <td><input type="text" data-d="${ds}" data-k="hol" value="${hol||''}" placeholder="假日名稱" style="width:80px;padding:4px;border:1px solid #d6c1ad;border-radius:6px;"></td>`;
+    tbody.appendChild(tr);
+  }
+}
+function collectAdminTargets(){
+  const items = [];
+  const seen = new Set();
+  $all('#tg-table input[data-d], #tg-table select[data-d]').forEach(el => seen.add(el.dataset.d));
+  seen.forEach(ds => {
+    const prep = $(`#tg-table select[data-d="${ds}"][data-k="prep"]`).value;
+    const rev  = $(`#tg-table input[data-d="${ds}"][data-k="rev"]`).value;
+    const hol  = $(`#tg-table input[data-d="${ds}"][data-k="hol"]`).value;
+    items.push({
+      date: ds, weekday: weekdayShort(new Date(ds)),
+      isPrepDay: prep === 'Y',
+      revenueTarget: Number(rev||0),
+      holidayName: hol, laborHourTarget: 0, note: ''
+    });
+  });
+  return items;
+}
+async function saveAdminTargets(){
+  try {
+    const items = collectAdminTargets();
+    await api('setTargets', { password: State.user.password, items });
+    toast('目標已儲存');
+    await refreshAll(false);
+    drawAdminTargets();
+  } catch (e) { toast('儲存失敗：' + e.message); }
+}
+async function importDefaultTargets(){
+  showConfirm({
+    title: '確認匯入預設目標？',
+    rows: [['範圍','2026-04-25 ~ 2026-05-31'], ['筆數', String(Object.keys(DEFAULT_TARGETS).length)]],
+    confirmText: '匯入',
+    onConfirm: async ()=>{
+      try {
+        const items = Object.values(DEFAULT_TARGETS);
+        await api('setTargets', { password: State.user.password, items });
+        toast('預設目標已匯入');
+        await refreshAll(false);
+        drawAdminTargets();
+      } catch (e) { toast('匯入失敗：' + e.message); }
+    }
+  });
+}
+
+/* ---------------- Waste 清單管理 ---------------- */
+let wasteEditState = [];
+function renderAdminWaste(){
+  if (State.wasteItems.length) {
+    wasteEditState = State.wasteItems.map(w => ({
+      itemId: w.ItemID, itemName: w.ItemName, unit: w.Unit || '', unitCost: Number(w.UnitCost||0), active: true
+    }));
+  } else {
+    wasteEditState = DEFAULT_WASTE_ITEMS.map(x => ({...x}));
+  }
+  drawWasteEdit();
+  $('#btn-add-waste').onclick = ()=>{
+    wasteEditState.push({ itemId: 'W' + (Date.now()), itemName: '', unit: '', unitCost: 0, active: true });
+    drawWasteEdit();
+  };
+  $('#btn-import-waste').onclick = ()=>{
+    showConfirm({
+      title: '匯入預設食材清單？', rows: [['筆數', String(DEFAULT_WASTE_ITEMS.length)]],
+      confirmText: '匯入', onConfirm: ()=>{
+        wasteEditState = DEFAULT_WASTE_ITEMS.map(x => ({...x}));
+        drawWasteEdit();
+        toast('已載入預設清單，請按「儲存」寫入');
+      }
+    });
+  };
+  $('#btn-save-waste').onclick = async ()=>{
+    try {
+      const items = wasteEditState
+        .filter(x => x.itemName && x.itemName.trim())
+        .map((x,i) => ({...x, itemId: x.itemId || ('W'+(i+1))}));
+      await api('setWasteItems', { password: State.user.password, items });
+      toast('清單已儲存');
+      await refreshAll(false);
+      renderAdminWaste();
+    } catch (e) { toast('儲存失敗：' + e.message); }
+  };
+}
+function drawWasteEdit(){
+  const tbody = $('#waste-edit-table tbody');
+  if (!wasteEditState.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">尚未有任何項目</td></tr>';
+    return;
+  }
+  tbody.innerHTML = wasteEditState.map((w, i)=>`
+    <tr data-i="${i}">
+      <td><input type="text" data-k="itemName" value="${(w.itemName||'').replace(/"/g,'&quot;')}" placeholder="例：高麗菜"></td>
+      <td><input type="text" data-k="unit" value="${(w.unit||'').replace(/"/g,'&quot;')}" placeholder="顆/片/條" style="width:60px;"></td>
+      <td><input type="number" data-k="unitCost" value="${w.unitCost||0}" style="width:80px;"></td>
+      <td><button class="btn-secondary" data-del="${i}" style="padding:6px 10px;border:1px solid #fecaca;color:#b91c1c;background:#fff;border-radius:6px;font-size:12px;">刪除</button></td>
+    </tr>
+  `).join('');
+  tbody.oninput = (e)=>{
+    const tr = e.target.closest('tr'); if (!tr) return;
+    const i = Number(tr.dataset.i);
+    const k = e.target.dataset.k;
+    if (k === 'unitCost') wasteEditState[i][k] = Number(e.target.value || 0);
+    else wasteEditState[i][k] = e.target.value;
+  };
+  tbody.onclick = (e)=>{
+    const di = e.target.dataset.del;
+    if (di!=null){ wasteEditState.splice(Number(di), 1); drawWasteEdit(); }
+  };
+}
+
+/* ---------------- 用戶清單（含頭像） ---------------- */
+function renderAdminUsers(){
+  const tbody = $('#admin-user-list');
+  if (!tbody) return;
+  tbody.innerHTML = Object.entries(USERS).map(([pwd, u]) => {
+    const ava = avatarFor(u.name);
+    const img = ava ? `<img src="${ava}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'">` : '';
+    return `<tr><td>${img}</td><td>${pwd}</td><td>${u.name}</td><td>${u.role}</td></tr>`;
+  }).join('');
+}
+
+/* =========================================================
+ *  啟動
+ * ========================================================= */
+function init(){
+  setupLogin();
+  $('#btn-logout').addEventListener('click', logout);
+  try {
+    const saved = JSON.parse(localStorage.getItem('biz_user') || 'null');
+    if (saved && USERS[saved.password]) {
+      State.user = saved;
+      afterLogin();
+      return;
+    }
+  } catch(_){}
+}
+init();
+</script>
+</body>
+</html>
