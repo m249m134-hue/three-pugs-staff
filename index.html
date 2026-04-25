@@ -59,6 +59,47 @@
   .card h2 { margin:0 0 10px 0; font-size:15px; color:#3f1d1d; font-weight:700; }
   .card .sub { font-size:12px; color:#867368; }
 
+  /* 當日目標 Hero 卡片（最大、最醒目） */
+  .today-hero {
+    background: linear-gradient(135deg, #7a1f1f 0%, #a83232 50%, #d97706 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 22px 20px;
+    text-align: center;
+    box-shadow: 0 6px 16px rgba(122,31,31,.32);
+    position: relative;
+    overflow: hidden;
+  }
+  .today-hero::after {
+    content: ''; position: absolute; right: -30px; top: -30px;
+    width: 140px; height: 140px; border-radius: 50%;
+    background: rgba(255,255,255,.08);
+  }
+  .today-hero .th-label {
+    font-size: 13px; opacity: .9; letter-spacing: 2px; font-weight: 600;
+  }
+  .today-hero .th-date {
+    font-size: 14px; opacity: .85; margin-top: 4px;
+  }
+  .today-hero .th-target {
+    font-size: 44px; font-weight: 800; letter-spacing: 1px;
+    margin: 8px 0 6px 0; text-shadow: 0 2px 4px rgba(0,0,0,.2);
+  }
+  .today-hero .th-status {
+    font-size: 14px; padding: 6px 14px; border-radius: 99px;
+    background: rgba(255,255,255,.18); display: inline-block;
+    backdrop-filter: blur(8px);
+  }
+  .today-hero.prep {
+    background: linear-gradient(135deg, #6b4d2c 0%, #a8907e 100%);
+  }
+  .today-hero.holiday {
+    background: linear-gradient(135deg, #be185d 0%, #ec4899 100%);
+  }
+  .today-hero.done {
+    background: linear-gradient(135deg, #14532d 0%, #15803d 50%, #22c55e 100%);
+  }
+
   /* KPI */
   .kpi-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .kpi {
@@ -249,17 +290,13 @@
     margin:0 0 4px 0; font-size:19px; color:#7a1f1f; text-align:center; letter-spacing:1px;
   }
   .login-card .sub { color:#867368; font-size:13px; margin-bottom: 18px; text-align:center; }
-  .login-card .pad-grid {
-    display:grid; grid-template-columns: repeat(3,1fr); gap:8px; margin-top:14px;
-  }
-  .login-card .pad-grid button {
-    padding: 16px 0; font-size: 20px; font-weight:600;
-    border:1px solid #f3e9dc; border-radius:10px; background:#fdf6ee; color:#3f1d1d;
-  }
-  .login-card .pad-grid button.fn { background:#fee2e2; color:#b91c1c; }
   .login-card .pad-display {
-    width:100%; padding:14px; font-size:24px; letter-spacing:8px; text-align:center;
-    border:1px solid #d6c1ad; border-radius:10px; background:#fff;
+    width:100%; padding:18px; font-size:28px; letter-spacing:10px; text-align:center;
+    border:2px solid #d6c1ad; border-radius:12px; background:#fff;
+    -webkit-user-select: text; user-select: text;
+  }
+  .login-card .pad-display:focus {
+    outline:none; border-color:#7a1f1f; box-shadow: 0 0 0 4px rgba(122,31,31,.12);
   }
   .login-preview {
     display:flex; align-items:center; gap:10px; padding:8px 12px; margin-top:10px;
@@ -292,21 +329,13 @@
     <img class="login-logo" src="images/logo.png" alt="Three Pugs Staff" onerror="this.style.display='none'">
     <h1>THREE PUGS STAFF</h1>
     <div class="sub">餐廳營業回報系統 · 請輸入密碼登入</div>
-    <input id="pad-display" class="pad-display" type="password" inputmode="numeric" placeholder="••••" autocomplete="off" />
+    <input id="pad-display" class="pad-display" type="password" inputmode="numeric" pattern="[0-9]*" placeholder="點此輸入密碼" autocomplete="off" autofocus />
     <div id="login-preview" class="login-preview" style="display:none;">
       <img id="login-pre-ava" src="">
       <div>
         <div class="nm" id="login-pre-name"></div>
         <div class="rl" id="login-pre-role"></div>
       </div>
-    </div>
-    <div class="pad-grid">
-      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
-      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button>
-      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button>
-      <button class="fn" id="pad-clear">清除</button>
-      <button data-k="0">0</button>
-      <button class="fn" id="pad-back">←</button>
     </div>
     <div style="margin-top:14px;">
       <button class="btn" id="btn-login">登入</button>
@@ -338,6 +367,14 @@
 
     <!-- ======================= Dashboard ======================= -->
     <section id="view-dashboard" style="display:none;">
+      <!-- 大號「當日目標」卡片 -->
+      <div class="today-hero mb-12" id="today-hero">
+        <div class="th-label">今日營業額目標</div>
+        <div class="th-date" id="th-date">—</div>
+        <div class="th-target" id="th-target">$—</div>
+        <div class="th-status" id="th-status">—</div>
+      </div>
+
       <div class="kpi-grid mb-12">
         <div class="kpi">
           <div class="label">本週累積（餐廳）</div>
@@ -592,8 +629,8 @@
   <nav class="navbar" id="navbar">
     <a href="#" data-go="dashboard"><span class="ico">📊</span><span>儀表板</span></a>
     <a href="#" data-go="form"><span class="ico">✏️</span><span>填寫</span></a>
-    <a href="#" data-go="records"><span class="ico">📋</span><span>紀錄</span></a>
-    <a href="#" data-go="month"><span class="ico">📅</span><span>月份</span></a>
+    <a href="#" data-go="records" id="nav-records"><span class="ico">📋</span><span>紀錄</span></a>
+    <a href="#" data-go="month" id="nav-month"><span class="ico">📅</span><span>月份</span></a>
     <a href="#" data-go="admin" id="nav-admin"><span class="ico">⚙️</span><span>管理</span></a>
   </nav>
 </div>
@@ -609,20 +646,22 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbzeByytb23hFJ1MR4AxvKxInNW_DsB3a6asW9tZiCPpnynDcAzB1rhQWmlqfy1DJMP9/exec';
 
 const USERS = {
-  '8888': { name: '管理員', role: 'admin'   },
-  '0000': { name: '汪穎',   role: 'manager' },
-  '1111': { name: '小江',   role: 'manager' },
-  '3333': { name: '阿威',   role: 'staff'   },
-  '6666': { name: 'Kevin',  role: 'staff'   }
+  '8888':   { name: '管理員',  role: 'admin'   },
+  '0000':   { name: '汪穎',    role: 'manager' },
+  '1111':   { name: '小江',    role: 'manager' },
+  '3333':   { name: '阿威',    role: 'staff'   },
+  '6666':   { name: 'Kevin',   role: 'staff'   },
+  '383838': { name: '測試帳號', role: 'demo'    }   // demo: 看真實資料 + 本地填寫不上雲端 + 金額遮罩
 };
 
 /* 頭像對應 — 對應 images/ 資料夾內的檔案 */
 const AVATARS = {
-  '管理員': 'images/logo.png',           // 管理員沿用品牌 LOGO
-  '汪穎':   'images/avatar-wangying.png',
-  '小江':   'images/avatar-xiaojiang.jpg',
-  '阿威':   'images/avatar-awei.png',
-  'Kevin':  'images/avatar-kevin.png'
+  '管理員':   'images/logo.png',
+  '汪穎':     'images/avatar-wangying.png',
+  '小江':     'images/avatar-xiaojiang.jpg',
+  '阿威':     'images/avatar-awei.png',
+  'Kevin':    'images/avatar-kevin.png',
+  '測試帳號': 'images/logo.png'           // 測試帳號使用品牌 LOGO
 };
 
 /* 人力成本：每小時 $200（要改數字直接改這行即可） */
@@ -734,6 +773,14 @@ const State = {
 function $(s, root){ return (root||document).querySelector(s); }
 function $all(s, root){ return Array.from((root||document).querySelectorAll(s)); }
 function fmtNT(v){ const n = Number(v||0); return n.toLocaleString('zh-TW', {maximumFractionDigits:0}); }
+function isDemo(){ return State.user && State.user.role === 'demo'; }
+/* 金額顯示函式：demo 帳號時把最高位數字以 * 替代（拍片用）。其他角色顯示完整金額。 */
+function fmtMoney(v){
+  const s = fmtNT(v);
+  if (!isDemo()) return s;
+  // 將第一個 1-9 數字（即最高位數）替換成 *
+  return s.replace(/[1-9]/, '*');
+}
 function pad2(n){ return String(n).padStart(2,'0'); }
 function dateOnly(d){
   if (!d) return '';
@@ -791,14 +838,6 @@ async function api(action, payload){
  * ========================================================= */
 function setupLogin(){
   const display = $('#pad-display');
-  $all('.pad-grid button[data-k]').forEach(b => {
-    b.addEventListener('click', ()=>{
-      if (display.value.length < 8) display.value += b.dataset.k;
-      updateLoginPreview();
-    });
-  });
-  $('#pad-back').addEventListener('click', ()=>{ display.value = display.value.slice(0,-1); updateLoginPreview(); });
-  $('#pad-clear').addEventListener('click', ()=>{ display.value = ''; updateLoginPreview(); });
   display.addEventListener('input', updateLoginPreview);
   $('#btn-login').addEventListener('click', doLogin);
   display.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
@@ -848,8 +887,12 @@ async function afterLogin(){
   av.src = ava;
   av.onerror = function(){ this.style.visibility='hidden'; };
 
-  $('#nav-admin').style.display = (State.user.role === 'admin' || State.user.role === 'manager') ? '' : 'none';
-  const cols = (State.user.role === 'admin' || State.user.role === 'manager') ? 5 : 4;
+  // 員工 (staff) 只看到「儀表板」與「填寫」；管理員/Manager 看到全部 5 個分頁
+  const isManager = (State.user.role === 'admin' || State.user.role === 'manager');
+  $('#nav-admin').style.display   = isManager ? '' : 'none';
+  $('#nav-records').style.display = isManager ? '' : 'none';
+  $('#nav-month').style.display   = isManager ? '' : 'none';
+  const cols = isManager ? 5 : 2;
   $('#navbar').style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
   go('dashboard');
@@ -947,6 +990,42 @@ function renderDashboard(){
   const days = [];
   for (let i=0;i<7;i++) days.push(addDays(monday, i));
 
+  // ===== 大號「當日目標」卡片 =====
+  const todayDS = todayStr();
+  const wkLabel = ['週日','週一','週二','週三','週四','週五','週六'][today.getDay()];
+  const todayTg = targetByDate(todayDS);
+  const todayIsPrep = todayTg && (todayTg.IsPrepDay === 'Y' || todayTg.IsPrepDay === true);
+  const todayHoliday = todayTg ? (todayTg.HolidayName || '') : '';
+  const todayTarget = todayIsPrep ? 0 : (todayTg ? Number(todayTg.RevenueTarget||0) : 0);
+  const todayActual = sumRevenue(reportsByDate(todayDS, '餐廳'));
+
+  const hero = $('#today-hero');
+  hero.classList.remove('prep','holiday','done');
+  $('#th-date').textContent = `${todayDS} ${wkLabel}${todayHoliday ? ' · ' + todayHoliday : ''}`;
+  if (todayIsPrep) {
+    hero.classList.add('prep');
+    $('#th-target').textContent = '🛒 備料日';
+    $('#th-status').textContent = '今天不營業，備料辛苦了';
+  } else if (todayTarget === 0) {
+    $('#th-target').textContent = '$—';
+    $('#th-status').textContent = '當日尚未設定目標';
+  } else {
+    $('#th-target').textContent = '$' + fmtMoney(todayTarget);
+    if (todayActual > 0) {
+      const pct = Math.round(todayActual/todayTarget*100);
+      const reached = todayActual >= todayTarget;
+      if (reached) hero.classList.add('done');
+      $('#th-status').textContent = reached
+        ? `🎉 已達標！實績 $${fmtMoney(todayActual)}（${pct}%）`
+        : `已填 $${fmtMoney(todayActual)}（${pct}%）　還差 $${fmtMoney(todayTarget - todayActual)}`;
+    } else {
+      $('#th-status').textContent = todayHoliday
+        ? `${todayHoliday}，加油達標 💪`
+        : '加油達標 💪';
+    }
+  }
+  if (todayHoliday && !todayIsPrep) hero.classList.add('holiday');
+
   const tbody = $('#week-table tbody');
   tbody.innerHTML = '';
   let weekTargetSum = 0, weekRevRest = 0;
@@ -977,8 +1056,8 @@ function renderDashboard(){
 
     tr.innerHTML = `
       <td>${ds.substring(5)} (${weekdayShort(d)}) ${tg && tg.HolidayName ? '<span class="badge badge-holiday">'+tg.HolidayName+'</span>' : ''}</td>
-      <td>${isPrep ? '備料日' : (tg ? fmtNT(tgVal) : '—')}</td>
-      <td>${restRev || cartRev ? `${fmtNT(restRev)}${cartRev?'<br><span class="small">餐車 '+fmtNT(cartRev)+'</span>':''}` : '—'}</td>
+      <td>${isPrep ? '備料日' : (tg ? fmtMoney(tgVal) : '—')}</td>
+      <td>${restRev || cartRev ? `${fmtMoney(restRev)}${cartRev?'<br><span class="small">餐車 '+fmtMoney(cartRev)+'</span>':''}` : '—'}</td>
       <td class="${pctClass}">${pct === null ? '—' : pct + '%'}</td>
       <td>${lab ? lab : '—'}</td>
       <td class="${lpClass}">${lp === null ? '—' : lp + '%'}</td>
@@ -988,8 +1067,8 @@ function renderDashboard(){
   });
 
   $('#week-range').textContent = `${dateOnly(monday).substring(5)} ~ ${dateOnly(addDays(monday,6)).substring(5)}`;
-  $('#kpi-week-rev').textContent = '$' + fmtNT(weekRevRest);
-  $('#kpi-week-rev-meta').textContent = `/ $${fmtNT(weekTargetSum)} 目標`;
+  $('#kpi-week-rev').textContent = '$' + fmtMoney(weekRevRest);
+  $('#kpi-week-rev-meta').textContent = `/ $${fmtMoney(weekTargetSum)} 目標`;
   const wpct = weekTargetSum > 0 ? Math.round(weekRevRest / weekTargetSum * 100) : 0;
   $('#kpi-week-pct').textContent = weekTargetSum > 0 ? wpct + '%' : '—';
   const prog = $('#kpi-week-progress');
@@ -1009,10 +1088,10 @@ function renderDashboard(){
     if (r.Type === '餐廳') mRest += Number(r.Revenue||0);
     if (r.Type === '餐車') { mCart += Number(r.Revenue||0); mRent += Number(r.Rent||0); }
   });
-  $('#kpi-month-rev').textContent = '$' + fmtNT(mRest);
-  $('#kpi-month-meta').textContent = `${mTarget>0 ? Math.round(mRest/mTarget*100) : 0}% / 目標 $${fmtNT(mTarget)}`;
-  $('#kpi-month-cart').textContent = '$' + fmtNT(mCart);
-  $('#kpi-month-cart-meta').textContent = `租金累積：$${fmtNT(mRent)}`;
+  $('#kpi-month-rev').textContent = '$' + fmtMoney(mRest);
+  $('#kpi-month-meta').textContent = `${mTarget>0 ? Math.round(mRest/mTarget*100) : 0}% / 目標 $${fmtMoney(mTarget)}`;
+  $('#kpi-month-cart').textContent = '$' + fmtMoney(mCart);
+  $('#kpi-month-cart-meta').textContent = `租金累積：$${fmtMoney(mRent)}`;
 
   // 點擊 KPI 卡片 → 開明細 modal
   const cardRest = $('#card-month-rev');
@@ -1299,16 +1378,32 @@ $('#btn-submit').addEventListener('click', ()=>{
     confirmText: '確認送出',
     onConfirm: async ()=>{
       try {
-        await api('submitReport', {
-          password: State.user.password,
-          date, type,
-          revenue: rev,
-          laborHours: lab,
-          rent: rent,
-          wasteItems: wasteItems,
-          wasteNote: wasteNote
-        });
-        await refreshAll(false);
+        if (isDemo()) {
+          // 測試帳號：不寫雲端，只 push 到本地 State.reports，介面會立即更新
+          State.reports.push({
+            ID: 'DEMO_' + Date.now(),
+            Date: date, FilledBy: State.user.name, Type: type,
+            Revenue: rev, LaborHours: lab, Rent: rent,
+            HasWaste: wasteItems.length ? 'Y' : 'N',
+            WasteItems: JSON.stringify(wasteItems),
+            WasteCost: wasteItems.reduce((a,w)=>a + Number(w.amount||0), 0),
+            WasteNote: wasteNote,
+            Status: 'active', SubmittedAt: new Date().toISOString(),
+            LastModifiedBy: State.user.name, LastModifiedAt: new Date().toISOString()
+          });
+          toast('🧪 測試模式：資料只存在這台手機，不會同步雲端');
+        } else {
+          await api('submitReport', {
+            password: State.user.password,
+            date, type,
+            revenue: rev,
+            laborHours: lab,
+            rent: rent,
+            wasteItems: wasteItems,
+            wasteNote: wasteNote
+          });
+          await refreshAll(false);
+        }
         // 依當日達標狀況彈出鼓勵語錄（只針對餐廳、且當日有設目標）
         showEncouragement({ date, type, revenue: rev });
       } catch (e) { toast('送出失敗：' + e.message); }
