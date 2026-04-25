@@ -676,12 +676,13 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbzeByytb23hFJ1MR4AxvKxInNW_DsB3a6asW9tZiCPpnynDcAzB1rhQWmlqfy1DJMP9/exec';
 
 const USERS = {
-  '8888':   { name: '管理員',  role: 'admin'   },
-  '0000':   { name: '汪穎',    role: 'manager' },
-  '1111':   { name: '小江',    role: 'manager' },
-  '3333':   { name: '阿威',    role: 'staff'   },
-  '6666':   { name: 'Kevin',   role: 'staff'   },
-  '383838': { name: '測試帳號', role: 'demo'    }   // demo: 看真實資料 + 本地填寫不上雲端 + 金額遮罩
+  '8888':   { name: '管理員',     role: 'admin'      },
+  '0000':   { name: '汪穎',       role: 'manager'    },
+  '1111':   { name: '小江',       role: 'manager'    },
+  '3333':   { name: '阿威',       role: 'staff'      },
+  '6666':   { name: 'Kevin',      role: 'staff'      },
+  '383838': { name: '測試帳號',    role: 'demo'       },  // 員工層級測試
+  '3838':   { name: '管理測試',    role: 'demo_admin' }   // 管理員層級測試（看得到全部分頁，但寫入只在本地）
 };
 
 /* 頭像對應 — 對應 images/ 資料夾內的檔案 */
@@ -691,7 +692,8 @@ const AVATARS = {
   '小江':     'images/avatar-xiaojiang.jpg',
   '阿威':     'images/avatar-awei.png',
   'Kevin':    'images/avatar-kevin.png',
-  '測試帳號': 'images/logo.png'           // 測試帳號使用品牌 LOGO
+  '測試帳號': 'images/logo.png',
+  '管理測試': 'images/logo.png'
 };
 
 /* 人力成本：每小時 $200（要改數字直接改這行即可） */
@@ -803,7 +805,17 @@ const State = {
 function $(s, root){ return (root||document).querySelector(s); }
 function $all(s, root){ return Array.from((root||document).querySelectorAll(s)); }
 function fmtNT(v){ const n = Number(v||0); return n.toLocaleString('zh-TW', {maximumFractionDigits:0}); }
-function isDemo(){ return State.user && State.user.role === 'demo'; }
+/* 兩種測試角色都不寫雲端 + 金額遮罩 */
+function isDemo(){
+  if (!State.user) return false;
+  return State.user.role === 'demo' || State.user.role === 'demo_admin';
+}
+/* 是否擁有管理員權限（含 demo_admin） */
+function isManagerRole(){
+  if (!State.user) return false;
+  const r = State.user.role;
+  return r === 'admin' || r === 'manager' || r === 'demo_admin';
+}
 /* 金額顯示函式：demo 帳號時把最高位數字以 * 替代（拍片用）。其他角色顯示完整金額。 */
 function fmtMoney(v){
   const s = fmtNT(v);
@@ -852,6 +864,42 @@ async function api(action, payload){
   if (!API_URL || API_URL.indexOf('請填入') >= 0) {
     throw new Error('尚未設定 API_URL，請編輯 index.html 最上方的 API_URL 常數');
   }
+  // 測試帳號（demo / demo_admin）：所有「寫入」action 都本地模擬成功，不打雲端
+  const writeActions = ['submitReport', 'editReport', 'deleteReport', 'setTargets', 'setWasteItems', 'setAggregates'];
+  if (isDemo() && writeActions.indexOf(action) >= 0) {
+    if (action === 'submitReport') {
+      const p = payload || {};
+      const wasteItems = p.wasteItems || [];
+      State.reports.push({
+        ID: 'DEMO_' + Date.now(),
+        Date: p.date, FilledBy: State.user.name, Type: p.type,
+        Revenue: Number(p.revenue)||0, LaborHours: Number(p.laborHours)||0, Rent: Number(p.rent)||0,
+        HasWaste: wasteItems.length ? 'Y' : 'N',
+        WasteItems: JSON.stringify(wasteItems),
+        WasteCost: wasteItems.reduce((a,w)=>a + Number(w.amount||0), 0),
+        WasteNote: p.wasteNote || '',
+        Status: 'active', SubmittedAt: new Date().toISOString(),
+        LastModifiedBy: State.user.name, LastModifiedAt: new Date().toISOString()
+      });
+      return { success: true, id: 'DEMO_' + Date.now() };
+    }
+    if (action === 'editReport') {
+      const p = payload || {};
+      const idx = State.reports.findIndex(r => r.ID === p.id);
+      if (idx >= 0) Object.assign(State.reports[idx], p.changes || {});
+      return { success: true };
+    }
+    if (action === 'deleteReport') {
+      const p = payload || {};
+      const idx = State.reports.findIndex(r => r.ID === p.id);
+      if (idx >= 0) State.reports[idx].Status = 'deleted';
+      State.reports = State.reports.filter(r => r.Status !== 'deleted');
+      return { success: true };
+    }
+    // 其他寫入動作（設目標/食材/累計）：靜默成功不寫雲端
+    return { success: true, demo: true };
+  }
+
   const body = Object.assign({ action }, payload || {});
   const res = await fetch(API_URL, {
     method: 'POST',
@@ -917,8 +965,8 @@ async function afterLogin(){
   av.src = ava;
   av.onerror = function(){ this.style.visibility='hidden'; };
 
-  // 員工 (staff) 只看到「儀表板」與「填寫」；管理員/Manager 看到全部 5 個分頁
-  const isManager = (State.user.role === 'admin' || State.user.role === 'manager');
+  // 員工 (staff / demo) 只看到「儀表板」與「填寫」；管理員/Manager/demo_admin 看到全部 5 個分頁
+  const isManager = isManagerRole();
   $('#nav-admin').style.display   = isManager ? '' : 'none';
   $('#nav-records').style.display = isManager ? '' : 'none';
   $('#nav-month').style.display   = isManager ? '' : 'none';
@@ -1288,7 +1336,7 @@ function checkDuplicate(){
   const ex = existingReport(date, type);
   const banner = $('#form-warning');
   const btn = $('#btn-submit');
-  const canEdit = State.user && (State.user.role === 'admin' || State.user.role === 'manager');
+  const canEdit = isManagerRole();
   if (ex) {
     btn.disabled = true;
     banner.style.display = '';
@@ -1415,30 +1463,18 @@ $('#btn-submit').addEventListener('click', ()=>{
     confirmText: '確認送出',
     onConfirm: async ()=>{
       try {
+        await api('submitReport', {
+          password: State.user.password,
+          date, type,
+          revenue: rev,
+          laborHours: lab,
+          rent: rent,
+          wasteItems: wasteItems,
+          wasteNote: wasteNote
+        });
         if (isDemo()) {
-          // 測試帳號：不寫雲端，只 push 到本地 State.reports，介面會立即更新
-          State.reports.push({
-            ID: 'DEMO_' + Date.now(),
-            Date: date, FilledBy: State.user.name, Type: type,
-            Revenue: rev, LaborHours: lab, Rent: rent,
-            HasWaste: wasteItems.length ? 'Y' : 'N',
-            WasteItems: JSON.stringify(wasteItems),
-            WasteCost: wasteItems.reduce((a,w)=>a + Number(w.amount||0), 0),
-            WasteNote: wasteNote,
-            Status: 'active', SubmittedAt: new Date().toISOString(),
-            LastModifiedBy: State.user.name, LastModifiedAt: new Date().toISOString()
-          });
           toast('🧪 測試模式：資料只存在這台手機，不會同步雲端');
         } else {
-          await api('submitReport', {
-            password: State.user.password,
-            date, type,
-            revenue: rev,
-            laborHours: lab,
-            rent: rent,
-            wasteItems: wasteItems,
-            wasteNote: wasteNote
-          });
           await refreshAll(false);
         }
         // 依當日達標狀況彈出鼓勵語錄（只針對餐廳、且當日有設目標）
@@ -1557,7 +1593,7 @@ function drawRecords(){
     .sort((a,b)=> dateOnly(b.Date).localeCompare(dateOnly(a.Date)) || String(b.SubmittedAt).localeCompare(String(a.SubmittedAt)));
   const root = $('#rec-list');
   if (!list.length) { root.innerHTML = '<div class="empty">沒有資料</div>'; return; }
-  const canEdit = State.user.role === 'admin' || State.user.role === 'manager';
+  const canEdit = isManagerRole();
   root.innerHTML = list.map(r => {
     let waste = '';
     try {
@@ -1594,7 +1630,7 @@ function drawRecords(){
 }
 
 window.editRec = function(id){
-  if (State.user.role !== 'admin' && State.user.role !== 'manager') return toast('無權限');
+  if (!isManagerRole()) return toast('無權限');
   const r = State.reports.find(x => x.ID === id);
   if (!r) return;
   const root = $('#modal-root');
@@ -1643,7 +1679,7 @@ window.editRec = function(id){
 };
 
 window.deleteRec = function(id){
-  if (State.user.role !== 'admin' && State.user.role !== 'manager') return toast('無權限');
+  if (!isManagerRole()) return toast('無權限');
   const r = State.reports.find(x => x.ID === id);
   if (!r) return;
   showConfirm({
@@ -1778,7 +1814,7 @@ function drawMonth(){
  *  管理員：tabs
  * ========================================================= */
 function renderAdmin(){
-  if (State.user.role !== 'admin' && State.user.role !== 'manager') return toast('無權限');
+  if (!isManagerRole()) return toast('無權限');
   $all('#view-admin .tabs button').forEach(b => {
     b.onclick = ()=>{
       $all('#view-admin .tabs button').forEach(x => x.classList.remove('active'));
