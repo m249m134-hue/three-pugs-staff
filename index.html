@@ -1357,15 +1357,23 @@ function renderDashboard(){
   renderMyWeekReminders(monday);
 }
 
-/* 員工儀表板：本週我是負責人 / 參與人的事件 */
+/* 儀表板「本週提醒事項」
+ * - 管理層（admin / manager / demo_admin）：本週所有事件
+ * - 員工 / demo：本週自己是負責人或參與人的事件
+ */
 function renderMyWeekReminders(monday){
   const wrap = $('#my-week-card-wrap');
   if (!wrap || !State.user) return;
   const userName = State.user.name;
+  const isManager = isManagerRole();
   const sunday = addDays(monday, 6);
   const monStr = dateOnlyLocal(monday);
   const sunStr = dateOnlyLocal(sunday);
   $('#my-week-range').textContent = `${monStr.substring(5)} ~ ${sunStr.substring(5)}`;
+
+  // 標題依角色變化
+  const titleEl = $('#my-week-card-wrap h2 span:first-child');
+  if (titleEl) titleEl.textContent = isManager ? '本週所有提醒事項' : '本週我的提醒事項';
 
   const myEvents = (State.events||[]).filter(e => {
     const sa = (e.StartAt||'').substring(0,10);
@@ -1373,6 +1381,7 @@ function renderMyWeekReminders(monday){
     if (!sa) return false;
     // 與本週有重疊
     if (ea < monStr || sa > sunStr) return false;
+    if (isManager) return true;   // 管理層看全部
     const owners = parseList(e.Owners);
     const att = parseList(e.Attendees);
     return owners.indexOf(userName) >= 0 || att.indexOf(userName) >= 0;
@@ -1381,7 +1390,7 @@ function renderMyWeekReminders(monday){
   const list = $('#my-week-list');
   if (!myEvents.length) {
     wrap.style.display = '';
-    list.innerHTML = '<div class="empty" style="padding:14px 0;font-size:13px;">本週沒有您的提醒 ✨</div>';
+    list.innerHTML = `<div class="empty" style="padding:14px 0;font-size:13px;">${isManager ? '本週沒有任何事件 📅' : '本週沒有您的提醒 ✨'}</div>`;
     return;
   }
   wrap.style.display = '';
@@ -1391,11 +1400,16 @@ function renderMyWeekReminders(monday){
     const date = sa.substring(5,10).replace('-','/');
     const time = sa.substring(11,16);
     const wkLabel = sa ? '週'+['日','一','二','三','四','五','六'][new Date(sa).getDay()] : '';
+    // 管理層額外顯示負責人，方便快速掌握誰在跑哪個案子
+    const owners = parseList(e.Owners);
+    const ownersLabel = isManager && owners.length ? `<span style="color:#5e3b2c;">👤 ${owners.join('、')}</span>` : '';
+    const addressLabel = e.Address ? `📍 ${e.Address}` : '';
+    const metaParts = [ownersLabel, addressLabel].filter(Boolean);
     return `<div class="my-week-card" data-id="${e.ID}">
       <div class="mw-date">${date}<br><span class="small">${wkLabel} ${time}</span></div>
       <div class="mw-body">
         <div class="mw-title"><span class="ev-cat-badge badge-${cat}">${e.Category}</span>${e.Title}</div>
-        <div class="mw-meta">${e.Address ? '📍 '+e.Address : ''}</div>
+        <div class="mw-meta">${metaParts.join('　')}</div>
       </div>
     </div>`;
   }).join('');
