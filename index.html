@@ -347,6 +347,109 @@
   details summary {
     cursor:pointer; padding:8px 0; font-weight:600; color:#3f1d1d; font-size:14px;
   }
+
+  /* ===== 行事曆 ===== */
+  .cal-bar { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .cal-bar .cal-month-label { flex:1; font-size:16px; font-weight:700; color:#3f1d1d; text-align:center; }
+  .cal-bar button.nav { padding:8px 12px; border-radius:8px; border:1px solid #d6c1ad; background:#fff; color:#3f1d1d; font-weight:700; }
+  .cal-grid {
+    display:grid; grid-template-columns:repeat(7,1fr); gap:3px;
+    background:#f3e9dc; border-radius:10px; padding:3px;
+  }
+  .cal-cell {
+    background:#fff; border-radius:6px;
+    min-height:62px; padding:4px 5px;
+    display:flex; flex-direction:column; gap:3px;
+    cursor:pointer; transition:background .15s;
+    position:relative; user-select:none;
+  }
+  .cal-cell:hover { background:#fdf6ee; }
+  .cal-cell.weekday-header {
+    background:#fdf6ee; min-height:auto; padding:6px 4px;
+    text-align:center; font-size:12px; font-weight:700; color:#5e3b2c;
+    cursor:default;
+  }
+  .cal-cell.weekday-header.sat { color:#1d4ed8; }
+  .cal-cell.weekday-header.sun { color:#b91c1c; }
+  .cal-cell.other-month { background:#faf3e8; opacity:.5; }
+  .cal-cell.today { background:#fff5d6; outline:2px solid #7a1f1f; outline-offset:-2px; }
+  .cal-cell .d-num { font-size:13px; font-weight:600; color:#3f1d1d; }
+  .cal-cell.weekend.sat .d-num { color:#1d4ed8; }
+  .cal-cell.weekend.sun .d-num { color:#b91c1c; }
+  .cal-cell .dots { display:flex; flex-wrap:wrap; gap:2px; margin-top:auto; }
+  .cal-cell .dot {
+    width:7px; height:7px; border-radius:50%;
+  }
+  .dot-marketing-post { background:#9333ea; }
+  .dot-marketing-shoot { background:#ec4899; }
+  .dot-cart-event { background:#ea580c; }
+  .dot-cart-prep { background:#ca8a04; }
+  .dot-other { background:#6b7280; }
+
+  .cal-legend { display:flex; flex-wrap:wrap; gap:10px; padding:6px 4px; font-size:11px; }
+  .cal-legend .lg { display:flex; align-items:center; gap:4px; color:#5e3b2c; }
+  .cal-legend .lg .dot { width:8px; height:8px; border-radius:50%; }
+
+  /* 該日事件清單 (點某天後出現) */
+  .day-events { margin-top:12px; }
+  .day-events h3 { margin:0 0 8px 0; font-size:14px; color:#3f1d1d; }
+  .ev-card {
+    border:1px solid #f3e9dc; border-left:4px solid #6b7280;
+    border-radius:8px; padding:10px 12px; margin-bottom:8px; cursor:pointer;
+    display:flex; gap:10px; align-items:flex-start;
+    transition:background .15s;
+  }
+  .ev-card:hover { background:#fdf6ee; }
+  .ev-card.cat-marketing-post { border-left-color:#9333ea; }
+  .ev-card.cat-marketing-shoot { border-left-color:#ec4899; }
+  .ev-card.cat-cart-event { border-left-color:#ea580c; }
+  .ev-card.cat-cart-prep { border-left-color:#ca8a04; }
+  .ev-card.cat-other { border-left-color:#6b7280; }
+  .ev-card .ev-time { font-size:11px; color:#867368; width:64px; flex-shrink:0; line-height:1.4; }
+  .ev-card .ev-body { flex:1; min-width:0; }
+  .ev-card .ev-title { font-size:14px; font-weight:600; color:#3f1d1d; margin-bottom:2px; }
+  .ev-card .ev-meta { font-size:11px; color:#867368; }
+  .ev-cat-badge {
+    display:inline-block; font-size:10px; padding:1px 6px; border-radius:99px;
+    color:#fff; font-weight:600; margin-right:4px;
+  }
+  .badge-marketing-post { background:#9333ea; }
+  .badge-marketing-shoot { background:#ec4899; }
+  .badge-cart-event { background:#ea580c; }
+  .badge-cart-prep { background:#ca8a04; }
+  .badge-other { background:#6b7280; }
+
+  /* 員工儀表板「本週我的提醒」 */
+  .my-week-card { padding:8px 10px; border-radius:8px; background:#fdf6ee; margin-bottom:8px;
+    display:flex; gap:10px; align-items:center; cursor:pointer; transition:background .15s; }
+  .my-week-card:hover { background:#fff5d6; }
+  .my-week-card .mw-date { font-size:13px; font-weight:700; color:#7a1f1f; width:62px; line-height:1.3; flex-shrink:0; }
+  .my-week-card .mw-body { flex:1; min-width:0; }
+  .my-week-card .mw-title { font-size:14px; font-weight:600; color:#3f1d1d; }
+  .my-week-card .mw-meta { font-size:11px; color:#867368; }
+
+  .person-chip-list { display:flex; flex-wrap:wrap; gap:5px; }
+  .person-chip {
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 8px 3px 3px; border-radius:99px; background:#fdf6ee;
+    border:1px solid #f3e9dc; font-size:12px; color:#3f1d1d;
+  }
+  .person-chip img {
+    width:18px; height:18px; border-radius:50%; object-fit:cover;
+  }
+  .person-checkbox-grid {
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:6px;
+    margin-top:6px;
+  }
+  .person-checkbox-grid label {
+    display:flex; align-items:center; gap:6px; padding:8px 10px;
+    border:1px solid #f3e9dc; border-radius:8px; cursor:pointer;
+    background:#fff; font-size:13px;
+  }
+  .person-checkbox-grid label.checked {
+    background:#fff5d6; border-color:#7a1f1f;
+  }
+  .person-checkbox-grid label input { margin:0; }
 </style>
 </head>
 <body>
@@ -430,6 +533,15 @@
           <div style="font-size:20px;font-weight:700;color:#a83232;" id="kpi-month-cart">—</div>
           <div class="sub" id="kpi-month-cart-meta">租金累積：—</div>
         </div>
+      </div>
+
+      <!-- 員工：本週我的提醒事項 -->
+      <div class="card" id="my-week-card-wrap" style="display:none;">
+        <h2 style="display:flex;justify-content:space-between;align-items:center;">
+          <span>本週我的提醒事項</span>
+          <span class="small" id="my-week-range"></span>
+        </h2>
+        <div id="my-week-list"></div>
       </div>
 
       <div class="card">
@@ -574,6 +686,36 @@
       </div>
     </section>
 
+    <!-- ======================= 行事曆 ======================= -->
+    <section id="view-calendar" style="display:none;">
+      <div class="cal-bar">
+        <button class="nav" id="cal-prev">‹</button>
+        <div class="cal-month-label" id="cal-month-label">—</div>
+        <button class="nav" id="cal-next">›</button>
+        <button class="nav" id="cal-today">今天</button>
+      </div>
+
+      <div class="card" style="padding:10px;">
+        <div class="cal-legend">
+          <span class="lg"><span class="dot dot-marketing-post"></span>行銷發文</span>
+          <span class="lg"><span class="dot dot-marketing-shoot"></span>行銷拍攝</span>
+          <span class="lg"><span class="dot dot-cart-event"></span>餐車檔期</span>
+          <span class="lg"><span class="dot dot-cart-prep"></span>餐車籌備</span>
+          <span class="lg"><span class="dot dot-other"></span>其他</span>
+        </div>
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+
+      <div class="card day-events" id="day-events" style="display:none;">
+        <h3 id="day-events-title">事件</h3>
+        <div id="day-events-list"></div>
+      </div>
+
+      <div class="btn-row" id="cal-add-row" style="display:none;">
+        <button class="btn" id="btn-add-event">+ 新增事件</button>
+      </div>
+    </section>
+
     <!-- ======================= 管理員 ======================= -->
     <section id="view-admin" style="display:none;">
       <div class="tabs">
@@ -659,8 +801,9 @@
   <nav class="navbar" id="navbar">
     <a href="#" data-go="dashboard"><span class="ico">📊</span><span>儀表板</span></a>
     <a href="#" data-go="form"><span class="ico">✏️</span><span>填寫</span></a>
+    <a href="#" data-go="calendar"><span class="ico">🗓️</span><span>行事曆</span></a>
     <a href="#" data-go="records" id="nav-records"><span class="ico">📋</span><span>紀錄</span></a>
-    <a href="#" data-go="month" id="nav-month"><span class="ico">📅</span><span>月份</span></a>
+    <a href="#" data-go="month" id="nav-month"><span class="ico">📆</span><span>月份</span></a>
     <a href="#" data-go="admin" id="nav-admin"><span class="ico">⚙️</span><span>管理</span></a>
   </nav>
 </div>
@@ -799,12 +942,12 @@ const State = {
   targets: [],
   wasteItems: [],
   aggregates: [],
+  events: [],
   currentView: 'dashboard'
 };
 
 function $(s, root){ return (root||document).querySelector(s); }
 function $all(s, root){ return Array.from((root||document).querySelectorAll(s)); }
-function fmtNT(v){ const n = Number(v||0); return n.toLocaleString('zh-TW', {maximumFractionDigits:0}); }
 /* 兩種測試角色都不寫雲端 + 金額遮罩 */
 function isDemo(){
   if (!State.user) return false;
@@ -816,13 +959,16 @@ function isManagerRole(){
   const r = State.user.role;
   return r === 'admin' || r === 'manager' || r === 'demo_admin';
 }
-/* 金額顯示函式：demo 帳號時把最高位數字以 * 替代（拍片用）。其他角色顯示完整金額。 */
-function fmtMoney(v){
-  const s = fmtNT(v);
-  if (!isDemo()) return s;
-  // 將第一個 1-9 數字（即最高位數）替換成 *
-  return s.replace(/[1-9]/, '*');
+/* 金額格式化：demo 帳號（測試帳號 / 管理測試）時自動把最高位數以 * 取代。
+   注意：本函式被全前端所有金額顯示處呼叫，因此 demo 一律遮罩生效。 */
+function fmtNT(v){
+  const n = Number(v||0);
+  const s = n.toLocaleString('zh-TW', {maximumFractionDigits:0});
+  if (isDemo()) return s.replace(/[1-9]/, '*');
+  return s;
 }
+/* fmtMoney 為向後相容別名，等同於 fmtNT */
+function fmtMoney(v){ return fmtNT(v); }
 function pad2(n){ return String(n).padStart(2,'0'); }
 function dateOnly(d){
   if (!d) return '';
@@ -865,10 +1011,10 @@ async function api(action, payload){
     throw new Error('尚未設定 API_URL，請編輯 index.html 最上方的 API_URL 常數');
   }
   // 測試帳號（demo / demo_admin）：所有「寫入」action 都本地模擬成功，不打雲端
-  const writeActions = ['submitReport', 'editReport', 'deleteReport', 'setTargets', 'setWasteItems', 'setAggregates'];
+  const writeActions = ['submitReport', 'editReport', 'deleteReport', 'setTargets', 'setWasteItems', 'setAggregates', 'addEvent', 'editEvent', 'deleteEvent'];
   if (isDemo() && writeActions.indexOf(action) >= 0) {
+    const p = payload || {};
     if (action === 'submitReport') {
-      const p = payload || {};
       const wasteItems = p.wasteItems || [];
       State.reports.push({
         ID: 'DEMO_' + Date.now(),
@@ -884,16 +1030,42 @@ async function api(action, payload){
       return { success: true, id: 'DEMO_' + Date.now() };
     }
     if (action === 'editReport') {
-      const p = payload || {};
       const idx = State.reports.findIndex(r => r.ID === p.id);
       if (idx >= 0) Object.assign(State.reports[idx], p.changes || {});
       return { success: true };
     }
     if (action === 'deleteReport') {
-      const p = payload || {};
       const idx = State.reports.findIndex(r => r.ID === p.id);
       if (idx >= 0) State.reports[idx].Status = 'deleted';
       State.reports = State.reports.filter(r => r.Status !== 'deleted');
+      return { success: true };
+    }
+    if (action === 'addEvent') {
+      const id = 'DEMO_E_' + Date.now();
+      State.events.push({
+        ID: id, Title: p.title||'', Category: p.category||'其他',
+        Owners: JSON.stringify(p.owners||[]), Attendees: JSON.stringify(p.attendees||[]),
+        StartAt: p.startAt||'', EndAt: p.endAt||'',
+        Address: p.address||'', Notes: p.notes||'',
+        Status: 'active', CreatedBy: State.user.name, CreatedAt: new Date().toISOString(),
+        LastModifiedBy: State.user.name, LastModifiedAt: new Date().toISOString()
+      });
+      return { success: true, id: id };
+    }
+    if (action === 'editEvent') {
+      const idx = State.events.findIndex(e => e.ID === p.id);
+      if (idx >= 0) {
+        const c = p.changes || {};
+        Object.keys(c).forEach(k => {
+          let v = c[k];
+          if (Array.isArray(v) || (typeof v === 'object' && v !== null)) v = JSON.stringify(v);
+          State.events[idx][k] = v;
+        });
+      }
+      return { success: true };
+    }
+    if (action === 'deleteEvent') {
+      State.events = State.events.filter(e => e.ID !== p.id);
       return { success: true };
     }
     // 其他寫入動作（設目標/食材/累計）：靜默成功不寫雲端
@@ -965,12 +1137,12 @@ async function afterLogin(){
   av.src = ava;
   av.onerror = function(){ this.style.visibility='hidden'; };
 
-  // 員工 (staff / demo) 只看到「儀表板」與「填寫」；管理員/Manager/demo_admin 看到全部 5 個分頁
+  // 員工(staff/demo) 只看「儀表板/填寫/行事曆」3 分頁；管理員/Manager/demo_admin 看到全部 6 分頁
   const isManager = isManagerRole();
   $('#nav-admin').style.display   = isManager ? '' : 'none';
   $('#nav-records').style.display = isManager ? '' : 'none';
   $('#nav-month').style.display   = isManager ? '' : 'none';
-  const cols = isManager ? 5 : 2;
+  const cols = isManager ? 6 : 3;
   $('#navbar').style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
 
   go('dashboard');
@@ -982,13 +1154,14 @@ async function afterLogin(){
  * ========================================================= */
 function go(view){
   State.currentView = view;
-  ['dashboard','form','records','month','admin'].forEach(v=>{
+  ['dashboard','form','calendar','records','month','admin'].forEach(v=>{
     const el = $('#view-' + v); if (el) el.style.display = (v===view) ? '' : 'none';
   });
   $all('.navbar a').forEach(a => a.classList.toggle('active', a.dataset.go === view));
   // 立即先用本地快取渲染（瞬間顯示）
   if (view === 'dashboard') renderDashboard();
   if (view === 'form')      renderForm();
+  if (view === 'calendar')  renderCalendar();
   if (view === 'records')   renderRecords();
   if (view === 'month')     renderMonth();
   if (view === 'admin')     renderAdmin();
@@ -1011,12 +1184,14 @@ async function refreshAll(showToast){
     State.targets = res.targets || [];
     State.wasteItems = res.wasteItems || [];
     State.aggregates = res.aggregates || [];
+    State.events = res.events || [];
     localStorage.setItem('biz_cache', JSON.stringify({
       ts: Date.now(),
       reports: State.reports,
       targets: State.targets,
       wasteItems: State.wasteItems,
-      aggregates: State.aggregates
+      aggregates: State.aggregates,
+      events: State.events
     }));
     if (showToast) toast('已更新');
     if (State.currentView === 'dashboard') renderDashboard();
@@ -1029,6 +1204,7 @@ async function refreshAll(showToast){
     if (c) {
       State.reports = c.reports; State.targets = c.targets; State.wasteItems = c.wasteItems;
       State.aggregates = c.aggregates || [];
+      State.events = c.events || [];
       toast('離線顯示快取資料');
     } else {
       toast('讀取失敗：' + e.message);
@@ -1176,6 +1352,59 @@ function renderDashboard(){
   const cardCart = $('#card-month-cart');
   if (cardRest) cardRest.onclick = ()=>showMonthDetailModal('餐廳');
   if (cardCart) cardCart.onclick = ()=>showMonthDetailModal('餐車');
+
+  // ===== 本週我的提醒事項 =====
+  renderMyWeekReminders(monday);
+}
+
+/* 員工儀表板：本週我是負責人 / 參與人的事件 */
+function renderMyWeekReminders(monday){
+  const wrap = $('#my-week-card-wrap');
+  if (!wrap || !State.user) return;
+  const userName = State.user.name;
+  const sunday = addDays(monday, 6);
+  const monStr = dateOnlyLocal(monday);
+  const sunStr = dateOnlyLocal(sunday);
+  $('#my-week-range').textContent = `${monStr.substring(5)} ~ ${sunStr.substring(5)}`;
+
+  const myEvents = (State.events||[]).filter(e => {
+    const sa = (e.StartAt||'').substring(0,10);
+    const ea = (e.EndAt||sa).substring(0,10);
+    if (!sa) return false;
+    // 與本週有重疊
+    if (ea < monStr || sa > sunStr) return false;
+    const owners = parseList(e.Owners);
+    const att = parseList(e.Attendees);
+    return owners.indexOf(userName) >= 0 || att.indexOf(userName) >= 0;
+  }).sort((a,b)=> (a.StartAt||'').localeCompare(b.StartAt||''));
+
+  const list = $('#my-week-list');
+  if (!myEvents.length) {
+    wrap.style.display = '';
+    list.innerHTML = '<div class="empty" style="padding:14px 0;font-size:13px;">本週沒有您的提醒 ✨</div>';
+    return;
+  }
+  wrap.style.display = '';
+  list.innerHTML = myEvents.map(e => {
+    const cat = CAT_CSS[e.Category] || 'other';
+    const sa = e.StartAt || '';
+    const date = sa.substring(5,10).replace('-','/');
+    const time = sa.substring(11,16);
+    const wkLabel = sa ? '週'+['日','一','二','三','四','五','六'][new Date(sa).getDay()] : '';
+    return `<div class="my-week-card" data-id="${e.ID}">
+      <div class="mw-date">${date}<br><span class="small">${wkLabel} ${time}</span></div>
+      <div class="mw-body">
+        <div class="mw-title"><span class="ev-cat-badge badge-${cat}">${e.Category}</span>${e.Title}</div>
+        <div class="mw-meta">${e.Address ? '📍 '+e.Address : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  $all('.my-week-card', list).forEach(el => {
+    el.onclick = ()=>{
+      const ev = State.events.find(x => x.ID === el.dataset.id);
+      if (ev) showEventDetail(ev);
+    };
+  });
 }
 
 /* =========================================================
@@ -1393,6 +1622,13 @@ document.addEventListener('click', e=>{
 });
 
 $('#btn-submit').addEventListener('click', ()=>{
+  // iOS Safari 修正：手機上輸入完直接點按鈕，input 值有時還沒 commit。
+  // 先強制把目前焦點的 input 失焦，並對所有 input 觸發 change 事件確保值已寫入。
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  $all('#view-form input, #view-form textarea').forEach(el => {
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
   const date = $('#f-date').value;
   const type = $('#f-type-wrap').style.display === 'none' ? '餐廳' : getSeg('#f-type');
   const rev = Number($('#f-rev').value || 0);
@@ -2041,6 +2277,399 @@ function renderAdminUsers(){
     const img = ava ? `<img src="${ava}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;" onerror="this.style.display='none'">` : '';
     return `<tr><td>${img}</td><td>${pwd}</td><td>${u.name}</td><td>${u.role}</td></tr>`;
   }).join('');
+}
+
+/* =========================================================
+ *  行事曆
+ * ========================================================= */
+
+/* 5 種類別對應 CSS suffix（用於 dot / badge / card border）*/
+const CAT_LIST = ['行銷發文', '行銷拍攝', '餐車檔期', '餐車籌備', '其他'];
+const CAT_CSS = {
+  '行銷發文': 'marketing-post',
+  '行銷拍攝': 'marketing-shoot',
+  '餐車檔期': 'cart-event',
+  '餐車籌備': 'cart-prep',
+  '其他':     'other'
+};
+
+let calCursor = null;        // 目前顯示的月份 (Date 物件，1 號)
+let selectedDayDS = null;    // 目前選中的日期字串
+
+function renderCalendar(){
+  if (!calCursor) {
+    const t = new Date();
+    calCursor = new Date(t.getFullYear(), t.getMonth(), 1);
+  }
+  $('#cal-prev').onclick = ()=>{ calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth()-1, 1); renderCalendar(); };
+  $('#cal-next').onclick = ()=>{ calCursor = new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 1); renderCalendar(); };
+  $('#cal-today').onclick = ()=>{ const t = new Date(); calCursor = new Date(t.getFullYear(), t.getMonth(), 1); selectedDayDS = todayStr(); renderCalendar(); };
+
+  $('#cal-month-label').textContent = `${calCursor.getFullYear()} 年 ${calCursor.getMonth()+1} 月`;
+
+  // 建構 7×N 格子
+  const grid = $('#cal-grid');
+  grid.innerHTML = '';
+  // 星期 header (一二三四五六日 — 但傳統 Sun 開頭也行；用週日起方便對應 getDay())
+  const wkLabels = ['日','一','二','三','四','五','六'];
+  wkLabels.forEach((w, i) => {
+    const cls = i === 0 ? 'sun' : (i === 6 ? 'sat' : '');
+    const div = document.createElement('div');
+    div.className = `cal-cell weekday-header ${cls}`;
+    div.textContent = w;
+    grid.appendChild(div);
+  });
+
+  const firstDay = new Date(calCursor.getFullYear(), calCursor.getMonth(), 1);
+  const monthDays = new Date(calCursor.getFullYear(), calCursor.getMonth()+1, 0).getDate();
+  const startWk = firstDay.getDay();           // 該月 1 號是週幾（0=Sun）
+  // 計算需要從上個月補幾天
+  const prevMonthLastDay = new Date(calCursor.getFullYear(), calCursor.getMonth(), 0).getDate();
+
+  let cells = [];
+  for (let i = startWk - 1; i >= 0; i--) {
+    const d = new Date(calCursor.getFullYear(), calCursor.getMonth()-1, prevMonthLastDay - i);
+    cells.push({ d, otherMonth: true });
+  }
+  for (let i = 1; i <= monthDays; i++) {
+    cells.push({ d: new Date(calCursor.getFullYear(), calCursor.getMonth(), i), otherMonth: false });
+  }
+  // 補後半，至少湊到 35 個 (5×7) 格子
+  const need = Math.ceil(cells.length / 7) * 7;
+  let nextDay = 1;
+  while (cells.length < need) {
+    cells.push({ d: new Date(calCursor.getFullYear(), calCursor.getMonth()+1, nextDay++), otherMonth: true });
+  }
+
+  cells.forEach(({ d, otherMonth }) => {
+    const ds = dateOnlyLocal(d);
+    const wk = d.getDay();
+    const dayEvts = eventsByDate(ds);
+    const cell = document.createElement('div');
+    let cls = 'cal-cell';
+    if (otherMonth) cls += ' other-month';
+    if (ds === todayStr()) cls += ' today';
+    if (wk === 0 || wk === 6) cls += ' weekend ' + (wk === 0 ? 'sun' : 'sat');
+    cell.className = cls;
+    const dotsHTML = dayEvts.slice(0, 6).map(e => `<span class="dot dot-${CAT_CSS[e.Category]||'other'}"></span>`).join('');
+    cell.innerHTML = `<div class="d-num">${d.getDate()}</div><div class="dots">${dotsHTML}</div>`;
+    cell.onclick = ()=>{
+      selectedDayDS = ds;
+      renderDayEvents();
+    };
+    grid.appendChild(cell);
+  });
+
+  // 預設選中今天（若在當月）
+  if (!selectedDayDS || !dateInMonth(selectedDayDS, calCursor)) {
+    selectedDayDS = (calCursor.getFullYear() === new Date().getFullYear() && calCursor.getMonth() === new Date().getMonth())
+      ? todayStr()
+      : dateOnlyLocal(firstDay);
+  }
+  renderDayEvents();
+
+  // 「+ 新增事件」只給 manager+
+  const addRow = $('#cal-add-row');
+  addRow.style.display = isManagerRole() ? '' : 'none';
+  $('#btn-add-event').onclick = ()=> showEventForm(null);
+}
+
+function dateOnlyLocal(d){ return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`; }
+function dateInMonth(ds, cursor){
+  return ds.startsWith(`${cursor.getFullYear()}-${pad2(cursor.getMonth()+1)}`);
+}
+
+/* 取得某日的所有事件（依事件起訖日期判斷） */
+function eventsByDate(ds){
+  return (State.events || []).filter(e => {
+    const sa = (e.StartAt || '').substring(0,10);
+    const ea = (e.EndAt || sa).substring(0,10);
+    return ds >= sa && ds <= ea;
+  }).sort((a,b) => (a.StartAt||'').localeCompare(b.StartAt||''));
+}
+
+function renderDayEvents(){
+  const wrap = $('#day-events');
+  const list = $('#day-events-list');
+  if (!selectedDayDS) { wrap.style.display = 'none'; return; }
+  const evts = eventsByDate(selectedDayDS);
+  wrap.style.display = '';
+  const d = new Date(selectedDayDS);
+  $('#day-events-title').textContent = `${selectedDayDS}（週${['日','一','二','三','四','五','六'][d.getDay()]}）的事件`;
+  if (!evts.length) {
+    list.innerHTML = '<div class="empty" style="padding:18px 0;">這天沒有任何事件</div>';
+    return;
+  }
+  list.innerHTML = evts.map(e => {
+    const cat = CAT_CSS[e.Category] || 'other';
+    const tStart = (e.StartAt || '').substring(11, 16) || '全天';
+    const tEnd = (e.EndAt || '').substring(11, 16) || '';
+    const owners = parseList(e.Owners);
+    const att = parseList(e.Attendees);
+    const all = owners.concat(att.filter(x => owners.indexOf(x) < 0));
+    return `<div class="ev-card cat-${cat}" data-id="${e.ID}">
+      <div class="ev-time">${tStart}${tEnd?'<br>~ '+tEnd:''}</div>
+      <div class="ev-body">
+        <div class="ev-title"><span class="ev-cat-badge badge-${cat}">${e.Category}</span>${e.Title}</div>
+        <div class="ev-meta">${all.length ? '👥 '+all.join('、') : ''}${e.Address ? ' 📍 '+e.Address : ''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  $all('.ev-card', list).forEach(el => {
+    el.onclick = ()=>{
+      const ev = State.events.find(x => x.ID === el.dataset.id);
+      if (ev) showEventDetail(ev);
+    };
+  });
+}
+
+function parseList(v){
+  if (!v) return [];
+  if (Array.isArray(v)) return v;
+  try { const a = JSON.parse(v); return Array.isArray(a) ? a : []; } catch(_) { return []; }
+}
+
+/* ===== 事件詳細 modal ===== */
+function showEventDetail(ev){
+  const cat = CAT_CSS[ev.Category] || 'other';
+  const owners = parseList(ev.Owners);
+  const att = parseList(ev.Attendees);
+  const fmtDT = (s) => {
+    if (!s) return '';
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return s;
+    return `${d.getFullYear()}/${pad2(d.getMonth()+1)}/${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  };
+  const ppl = (names) => names.map(n => {
+    const ava = avatarFor(n);
+    return `<span class="person-chip">${ava?'<img src="'+ava+'">':''}${n}</span>`;
+  }).join('');
+
+  const canEdit = isManagerRole();
+  const root = $('#modal-root');
+  root.innerHTML = `
+    <div class="modal-mask" id="ev-mask">
+      <div class="modal" style="max-width:480px;">
+        <button type="button" class="modal-close" id="ev-x" aria-label="關閉">✕</button>
+        <h3><span class="ev-cat-badge badge-${cat}">${ev.Category}</span>${ev.Title}</h3>
+        <div class="row"><span class="lbl">時間</span><span>${fmtDT(ev.StartAt)} ~<br>${fmtDT(ev.EndAt)}</span></div>
+        ${ev.Address ? `<div class="row"><span class="lbl">📍 地址</span><span>${ev.Address}</span></div>` : ''}
+        ${owners.length ? `<div style="padding:6px 0;"><div style="font-size:12px;color:#867368;margin-bottom:4px;">負責人</div><div class="person-chip-list">${ppl(owners)}</div></div>` : ''}
+        ${att.length ? `<div style="padding:6px 0;"><div style="font-size:12px;color:#867368;margin-bottom:4px;">參與人</div><div class="person-chip-list">${ppl(att)}</div></div>` : ''}
+        ${ev.Notes ? `<div class="row"><span class="lbl">備註</span><span style="white-space:pre-wrap;">${ev.Notes}</span></div>` : ''}
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn" id="ev-ics" style="flex:1;">📲 加到我的行事曆</button>
+        </div>
+        ${canEdit ? `<div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn btn-secondary" id="ev-edit" style="flex:1;">編輯</button>
+          <button class="btn btn-danger" id="ev-del" style="flex:1;">刪除</button>
+        </div>` : ''}
+      </div>
+    </div>`;
+  const closeEv = ()=>{ root.innerHTML = ''; };
+  $('#ev-x').onclick = closeEv;
+  $('#ev-mask').addEventListener('click', e => { if (e.target === $('#ev-mask')) closeEv(); });
+  $('#ev-ics').onclick = ()=> downloadICS(ev);
+  if (canEdit) {
+    $('#ev-edit').onclick = ()=>{ closeEv(); showEventForm(ev); };
+    $('#ev-del').onclick = ()=>{
+      showConfirm({
+        title: '確定刪除此事件？',
+        rows: [['標題', ev.Title], ['類別', ev.Category]],
+        confirmText: '刪除',
+        danger: true,
+        onConfirm: async ()=>{
+          try {
+            await api('deleteEvent', { password: State.user.password, id: ev.ID });
+            toast('已刪除');
+            await refreshAll(false);
+            closeEv(); renderCalendar();
+          } catch(e){ toast('刪除失敗：'+e.message); }
+        }
+      });
+    };
+  }
+}
+
+/* ===== 一鍵加到行事曆 (.ics) ===== */
+function downloadICS(ev){
+  const fmtICS = (s) => {
+    if (!s) return '';
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return s;
+    // YYYYMMDDTHHmmssZ (UTC)
+    return d.getUTCFullYear() + pad2(d.getUTCMonth()+1) + pad2(d.getUTCDate()) + 'T' +
+           pad2(d.getUTCHours()) + pad2(d.getUTCMinutes()) + pad2(d.getUTCSeconds()) + 'Z';
+  };
+  const escapeICS = (s) => String(s||'').replace(/[\\,;]/g, c => '\\'+c).replace(/\n/g, '\\n');
+  const owners = parseList(ev.Owners);
+  const att = parseList(ev.Attendees);
+  const dscArr = [];
+  if (owners.length) dscArr.push('負責人: ' + owners.join('、'));
+  if (att.length) dscArr.push('參與人: ' + att.join('、'));
+  if (ev.Notes) dscArr.push(ev.Notes);
+  const dsc = dscArr.join('\\n\\n');
+
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Three Pugs Staff//ZH-TW//',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'BEGIN:VEVENT',
+    'UID:' + ev.ID + '@threepugs.staff',
+    'DTSTAMP:' + fmtICS(new Date()),
+    'DTSTART:' + fmtICS(ev.StartAt),
+    'DTEND:' + fmtICS(ev.EndAt || ev.StartAt),
+    'SUMMARY:' + escapeICS('[' + ev.Category + '] ' + (ev.Title||'')),
+    'DESCRIPTION:' + escapeICS(dsc),
+    'LOCATION:' + escapeICS(ev.Address || ''),
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = (ev.Title||'event') + '.ics';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  toast('已下載 .ics 檔，請從通知中心或檔案 App 開啟匯入行事曆');
+}
+
+/* ===== 事件新增 / 編輯 表單 modal ===== */
+function showEventForm(ev){
+  const isNew = !ev;
+  const owners = ev ? parseList(ev.Owners) : [];
+  const attendees = ev ? parseList(ev.Attendees) : [];
+  // 預設起訖時間：選中日期（或今天）的 09:00 ~ 18:00
+  const baseDate = ev ? (ev.StartAt||'').substring(0,10)
+                      : (selectedDayDS || todayStr());
+  const defStart = ev ? toDateTimeLocal(ev.StartAt) : (baseDate + 'T09:00');
+  const defEnd   = ev ? toDateTimeLocal(ev.EndAt)   : (baseDate + 'T18:00');
+  const allUsers = Object.values(USERS).filter(u => u.role !== 'demo' && u.role !== 'demo_admin').map(u => u.name);
+
+  const root = $('#modal-root');
+  root.innerHTML = `
+    <div class="modal-mask" id="evf-mask">
+      <div class="modal" style="max-width:520px;">
+        <button type="button" class="modal-close" id="evf-x">✕</button>
+        <h3>${isNew ? '新增事件' : '編輯事件'}</h3>
+        <div class="form-row">
+          <label>標題 *</label>
+          <input type="text" id="evf-title" placeholder="例：板橋市集擺攤" value="${ev?(ev.Title||'').replace(/"/g,'&quot;'):''}">
+        </div>
+        <div class="form-row">
+          <label>類別</label>
+          <select id="evf-cat">
+            ${CAT_LIST.map(c => `<option value="${c}"${ev&&ev.Category===c?' selected':''}>${c}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-row">
+          <label>起始時間 *</label>
+          <input type="datetime-local" id="evf-start" value="${defStart}">
+        </div>
+        <div class="form-row">
+          <label>結束時間 *</label>
+          <input type="datetime-local" id="evf-end" value="${defEnd}">
+        </div>
+        <div class="form-row" id="evf-addr-wrap" style="display:none;">
+          <label>📍 地址（選填）</label>
+          <input type="text" id="evf-addr" placeholder="例：新北市板橋區XX路 100 號" value="${ev?(ev.Address||'').replace(/"/g,'&quot;'):''}">
+        </div>
+        <div class="form-row">
+          <label>負責人（可多選）</label>
+          <div class="person-checkbox-grid" id="evf-owners">
+            ${allUsers.map(n => `<label class="${owners.indexOf(n)>=0?'checked':''}"><input type="checkbox" data-name="${n}"${owners.indexOf(n)>=0?' checked':''}> ${n}</label>`).join('')}
+          </div>
+        </div>
+        <div class="form-row">
+          <label>參與人（可多選）</label>
+          <div class="person-checkbox-grid" id="evf-attendees">
+            ${allUsers.map(n => `<label class="${attendees.indexOf(n)>=0?'checked':''}"><input type="checkbox" data-name="${n}"${attendees.indexOf(n)>=0?' checked':''}> ${n}</label>`).join('')}
+          </div>
+        </div>
+        <div class="form-row">
+          <label>備註</label>
+          <textarea id="evf-notes" placeholder="（選填）">${ev?(ev.Notes||''):''}</textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="evf-cancel">取消</button>
+          <button class="btn" id="evf-save">${isNew ? '新增' : '儲存'}</button>
+        </div>
+      </div>
+    </div>`;
+
+  // 類別變更時，餐車類顯示地址欄
+  const updateAddrVisibility = ()=>{
+    const c = $('#evf-cat').value;
+    $('#evf-addr-wrap').style.display = (c === '餐車檔期' || c === '餐車籌備') ? '' : 'none';
+  };
+  $('#evf-cat').addEventListener('change', updateAddrVisibility);
+  updateAddrVisibility();
+
+  // checkbox 視覺切換（label 加 .checked）
+  ['#evf-owners', '#evf-attendees'].forEach(sel => {
+    $(sel).addEventListener('change', e => {
+      const lbl = e.target.closest('label');
+      if (lbl) lbl.classList.toggle('checked', e.target.checked);
+    });
+  });
+
+  const closeF = ()=>{ root.innerHTML = ''; };
+  $('#evf-x').onclick = closeF;
+  $('#evf-cancel').onclick = closeF;
+  $('#evf-mask').addEventListener('click', e => { if (e.target === $('#evf-mask')) closeF(); });
+
+  $('#evf-save').onclick = async ()=>{
+    const title = $('#evf-title').value.trim();
+    const category = $('#evf-cat').value;
+    const startAt = $('#evf-start').value;
+    const endAt = $('#evf-end').value;
+    const address = $('#evf-addr').value.trim();
+    const notes = $('#evf-notes').value.trim();
+    const ownersSel = $all('#evf-owners input:checked').map(el => el.dataset.name);
+    const attSel = $all('#evf-attendees input:checked').map(el => el.dataset.name);
+    if (!title) return toast('請填標題');
+    if (!startAt || !endAt) return toast('請選擇起訖時間');
+    if (endAt < startAt) return toast('結束時間不能早於起始時間');
+    try {
+      if (isNew) {
+        await api('addEvent', {
+          password: State.user.password,
+          title, category,
+          owners: ownersSel, attendees: attSel,
+          startAt, endAt, address, notes
+        });
+        toast('已新增事件');
+      } else {
+        await api('editEvent', {
+          password: State.user.password,
+          id: ev.ID,
+          changes: {
+            Title: title, Category: category,
+            Owners: JSON.stringify(ownersSel), Attendees: JSON.stringify(attSel),
+            StartAt: startAt, EndAt: endAt,
+            Address: address, Notes: notes
+          }
+        });
+        toast('已儲存');
+      }
+      await refreshAll(false);
+      closeF(); renderCalendar();
+    } catch(e) { toast('儲存失敗：' + e.message); }
+  };
+}
+
+function toDateTimeLocal(s){
+  if (!s) return '';
+  const d = new Date(s);
+  if (isNaN(d.getTime())) {
+    // 也可能本身就是 datetime-local 字串
+    return String(s).substring(0, 16);
+  }
+  // 轉成 yyyy-MM-ddTHH:mm（本地時間）
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 }
 
 /* =========================================================
